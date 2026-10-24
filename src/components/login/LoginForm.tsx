@@ -1,16 +1,17 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Loader2, Check } from "lucide-react";
 import { loginSchema, type LoginSchema } from "@/validation";
 
 export const LoginForm: React.FC = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [submissionState, setSubmissionState] = useState<"idle" | "loading" | "success">("idle");
 
   const {
     register,
-    handleSubmit,
     formState: { errors },
   } = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
@@ -21,14 +22,10 @@ export const LoginForm: React.FC = () => {
     },
   });
 
-  const onSubmit = (_data: LoginSchema) => {
+  const onSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setSubmissionState("loading");
-    setTimeout(() => {
-      setSubmissionState("success");
-      setTimeout(() => {
-        setSubmissionState("idle");
-      }, 2000);
-    }, 1000);
+    navigate("/dashboard");
   };
 
   return (
@@ -100,7 +97,7 @@ export const LoginForm: React.FC = () => {
         </div>
 
         {/* Formulario */}
-        <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+        <form className="space-y-4" onSubmit={onSubmit}>
           {/* Campo Correo Profesional */}
           <div>
             <label

@@ -13,6 +13,67 @@
   --color-brand-700: #1d4586;
   --color-brand-800: #1c3b6f;
   --color-brand-900: #1b325c;
+
+  --color-primary: #024594;
+  --color-primary-container: #2c5ead;
+  --color-primary-fixed: #d7e2ff;
+  --color-primary-fixed-dim: #acc7ff;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #cbdaff;
+  --color-on-primary-fixed: #001a40;
+  --color-on-primary-fixed-variant: #004492;
+
+  --color-secondary: #00639a;
+  --color-secondary-container: #4db2ff;
+  --color-secondary-fixed: #cde5ff;
+  --color-secondary-fixed-dim: #95ccff;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #00436a;
+  --color-on-secondary-fixed: #001d32;
+  --color-on-secondary-fixed-variant: #004a75;
+
+  --color-tertiary: #004d71;
+  --color-tertiary-container: #006694;
+  --color-tertiary-fixed: #c9e6ff;
+  --color-tertiary-fixed-dim: #8aceff;
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-container: #b9dfff;
+  --color-on-tertiary-fixed: #001e2f;
+  --color-on-tertiary-fixed-variant: #004b6f;
+
+  --color-surface: #f9f9ff;
+  --color-surface-dim: #ccdafa;
+  --color-surface-bright: #f9f9ff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f1f3ff;
+  --color-surface-container: #e8eeff;
+  --color-surface-container-high: #dfe8ff;
+  --color-surface-container-highest: #d7e3ff;
+  --color-surface-ice: #C4E2F5;
+  --color-surface-canvas-start: #F8FBFF;
+  --color-surface-canvas-end: #EAF6FF;
+
+  --color-on-surface: #0c1b33;
+  --color-on-surface-variant: #434751;
+  --color-outline: #737782;
+  --color-outline-variant: #c3c6d3;
+
+  --color-inverse-surface: #223149;
+  --color-inverse-on-surface: #ecf0ff;
+  --color-inverse-primary: #acc7ff;
+
+  --color-status-success: #34D399;
+  --color-status-warning: #F59E0B;
+  --color-status-danger: #EF4444;
+
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+  --color-on-error: #ffffff;
+
+  --color-glass-fill: rgba(255, 255, 255, 0.72);
+  --color-glass-stroke: rgba(255, 255, 255, 0.85);
+  --color-glass-stroke-subtle: rgba(44, 94, 173, 0.12);
 }
 
 /* Estilos Glassmorphism Premium */
