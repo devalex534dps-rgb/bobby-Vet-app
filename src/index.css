@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', sans-serif;
+  --font-display: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  --color-brand-50: #f0f7ff;
+  --color-brand-100: #e0effe;
+  --color-brand-200: #bae0fd;
+  --color-brand-300: #7cc5fb;
+  --color-brand-400: #4bb8fa;
+  --color-brand-500: #1591dc;
+  --color-brand-600: #2c5ead;
+  --color-brand-700: #1d4586;
+  --color-brand-800: #1c3b6f;
+  --color-brand-900: #1b325c;
+}
+
+/* Estilos Glassmorphism Premium */
+.glass-card {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 20px 50px -12px rgba(44, 94, 173, 0.12),
+              0 0 0 1px rgba(255, 255, 255, 0.7) inset,
+              0 1px 2px 0 rgba(0, 0, 0, 0.04);
+}
+
+.glass-pill {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.hero-glow-blob {
+  filter: blur(80px);
+  opacity: 0.65;
+  mix-blend-mode: multiply;
+  animation: pulse-slow 9s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-slow {
+  0% { transform: scale(1) translate(0px, 0px); }
+  50% { transform: scale(1.08) translate(15px, -20px); }
+  100% { transform: scale(0.95) translate(-10px, 15px); }
+}
+
+.floating-card-1 {
+  animation: float-soft 6s ease-in-out infinite;
+}
+.floating-card-2 {
+  animation: float-soft 7s ease-in-out infinite 1s;
+}
+.floating-card-3 {
+  animation: float-soft 8s ease-in-out infinite 2s;
+}
+
+@keyframes float-soft {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+/* Radial grid pattern */
+.bg-grid-dots {
+  background-image: radial-gradient(rgba(44, 94, 173, 0.12) 1.2px, transparent 1.2px);
+  background-size: 24px 24px;
+}
+
+/* Glow border effect */
+.input-focus-glow:focus-within {
+  box-shadow: 0 0 0 3px rgba(44, 94, 173, 0.18), 0 2px 8px rgba(44, 94, 173, 0.08);
+  border-color: #2c5ead;
+}
