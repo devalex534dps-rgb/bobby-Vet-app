@@ -1,0 +1,9 @@
+services:
+  bobby:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bobby-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
