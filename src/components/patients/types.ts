@@ -9,8 +9,18 @@ export type PatientStatus =
   | "Vacuna pendiente"
   | "En recuperación";
 
-export interface Patient {
+export interface Paciente {
   id: string;
+  nombre: string;
+  especie: string;
+  raza: string;
+  propietario: string;
+  edad: string;
+  estado: string;
+  imagen: string;
+}
+
+export interface Patient extends Paciente {
   name: string;
   chipId: string;
   photoUrl: string;

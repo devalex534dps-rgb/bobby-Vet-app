@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useUsers } from "@/hooks/useUsers";
 
 export const ExecutiveGreeting: React.FC = () => {
+  const { currentUser } = useUsers();
   const [selectedPeriod, setSelectedPeriod] = useState("Últimos 30 días");
 
   const periods = [
@@ -16,10 +18,17 @@ export const ExecutiveGreeting: React.FC = () => {
   return (
     <header className="flex flex-col xl:flex-row xl:items-end justify-between gap-4 mb-6">
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-on-surface tracking-tight">
-          Bienvenido de nuevo,{" "}
-          <span className="text-primary font-bold">Dr. Julian Rivera</span>
-        </h1>
+        <div className="flex items-center gap-2 flex-wrap">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-on-surface tracking-tight">
+            Bienvenido de nuevo,{" "}
+            <span className="text-primary font-bold">
+              {currentUser.firstName} {currentUser.lastName}
+            </span>
+          </h1>
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-primary-fixed text-primary text-[11px] font-bold uppercase tracking-wider">
+            {currentUser.role}
+          </span>
+        </div>
         <p className="text-xs sm:text-sm text-on-surface-variant">
           La capacidad operativa de su clínica está al{" "}
           <span className="font-bold text-on-surface">92%</span> hoy con un delta de

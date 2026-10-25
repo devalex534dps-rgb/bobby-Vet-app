@@ -133,3 +133,124 @@
   box-shadow: 0 0 0 3px rgba(44, 94, 173, 0.18), 0 2px 8px rgba(44, 94, 173, 0.08);
   border-color: #2c5ead;
 }
+
+/* Custom SweetAlert Bobby Theme */
+.bobby-swal-container,
+.bobby-swal-backdrop {
+  background: rgba(12, 27, 51, 0.45) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+
+.bobby-swal-popup {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  border-radius: 1.5rem !important; /* 24px */
+  box-shadow: 0 25px 60px -15px rgba(2, 69, 148, 0.22),
+              0 0 0 1px rgba(44, 94, 173, 0.1),
+              0 2px 4px 0 rgba(0, 0, 0, 0.04) !important;
+  padding: 2rem 1.75rem 1.75rem !important;
+  max-width: 440px !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+.bobby-swal-icon {
+  border: none !important;
+  margin: 0 auto 1.25rem !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+.bobby-swal-icon-inner {
+  width: 4.25rem;
+  height: 4.25rem;
+  border-radius: 1.25rem;
+  background: linear-gradient(135deg, #f0f7ff 0%, #e0effe 100%);
+  border: 1px solid #bae0fd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px -4px rgba(44, 94, 173, 0.18),
+              0 0 0 4px rgba(224, 239, 254, 0.5);
+  animation: bobby-icon-pop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes bobby-icon-pop {
+  0% { transform: scale(0.7); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.bobby-swal-title {
+  color: #0c1b33 !important;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif !important;
+  font-size: 1.35rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+  padding: 0 0 0.5rem 0 !important;
+}
+
+.bobby-swal-html {
+  margin: 0.25rem 0 1.5rem 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+
+.bobby-swal-actions {
+  display: flex !important;
+  gap: 0.75rem !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.bobby-swal-confirm-btn {
+  flex: 1 !important;
+  padding: 0.75rem 1.25rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  border-radius: 0.75rem !important;
+  background: linear-gradient(135deg, #024594 0%, #2c5ead 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  cursor: pointer !important;
+  box-shadow: 0 6px 18px -4px rgba(2, 69, 148, 0.4) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.bobby-swal-confirm-btn:hover {
+  background: linear-gradient(135deg, #023675 0%, #1d4586 100%) !important;
+  box-shadow: 0 8px 22px -4px rgba(2, 69, 148, 0.5) !important;
+  transform: translateY(-1px);
+}
+
+.bobby-swal-confirm-btn:active {
+  transform: translateY(0);
+}
+
+.bobby-swal-cancel-btn {
+  flex: 1 !important;
+  padding: 0.75rem 1.25rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  border-radius: 0.75rem !important;
+  background: #f1f3ff !important;
+  color: #434751 !important;
+  border: 1px solid #dfe8ff !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.bobby-swal-cancel-btn:hover {
+  background: #e8eeff !important;
+  color: #0c1b33 !important;
+  border-color: #d7e3ff !important;
+}
+

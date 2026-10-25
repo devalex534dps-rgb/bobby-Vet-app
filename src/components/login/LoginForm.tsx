@@ -1,31 +1,44 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Loader2, Check } from "lucide-react";
-import { loginSchema, type LoginSchema } from "@/validation";
+import { useUsers } from "@/hooks/useUsers";
 
 export const LoginForm: React.FC = () => {
   const navigate = useNavigate();
+  const { login } = useUsers();
   const [showPassword, setShowPassword] = useState(false);
   const [submissionState, setSubmissionState] = useState<"idle" | "loading" | "success">("idle");
+  const [authError, setAuthError] = useState<string | null>(null);
 
   const {
     register,
-    formState: { errors },
-  } = useForm<LoginSchema>({
-    resolver: zodResolver(loginSchema),
+    getValues,
+  } = useForm<{ identifier: string; password: string; rememberMe: boolean }>({
     defaultValues: {
-      email: "julian.rivera@bobbyvet.com",
+      identifier: "emilys",
       password: "Password123!",
       rememberMe: true,
     },
   });
 
-  const onSubmit = (e?: React.FormEvent) => {
+  const onSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+    setAuthError(null);
     setSubmissionState("loading");
-    navigate("/dashboard");
+
+    const identifier = getValues("identifier");
+    const result = await login(identifier);
+
+    if (result.success) {
+      setSubmissionState("success");
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 400);
+    } else {
+      setSubmissionState("idle");
+      setAuthError(result.error || "Usuario o correo no encontrado en DummyJSON.");
+    }
   };
 
   return (
@@ -98,33 +111,33 @@ export const LoginForm: React.FC = () => {
 
         {/* Formulario */}
         <form className="space-y-4" onSubmit={onSubmit}>
-          {/* Campo Correo Profesional */}
+          {/* Campo Correo Profesional o Usuario */}
           <div>
             <label
               className="block text-xs font-semibold text-slate-700 mb-1.5"
-              htmlFor="email"
+              htmlFor="identifier"
             >
-              Correo profesional
+              Usuario o correo profesional
             </label>
             <div
               className={`relative rounded-xl border bg-white/90 input-focus-glow transition-all duration-150 ${
-                errors.email ? "border-red-400" : "border-slate-200/90"
+                authError ? "border-red-400" : "border-slate-200/90"
               }`}
             >
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                 <Mail className="w-4 h-4" />
               </div>
               <input
-                {...register("email")}
+                {...register("identifier")}
                 className="w-full pl-10 pr-4 py-2.5 text-sm bg-transparent border-0 rounded-xl focus:ring-0 focus:outline-none text-slate-800 placeholder-slate-400 font-medium"
-                id="email"
-                placeholder="nombre@bobbyvet.com"
-                type="email"
+                id="identifier"
+                placeholder="ej. emilys o emily.johnson@x.dummyjson.com"
+                type="text"
               />
             </div>
-            {errors.email && (
-              <p className="mt-1 text-xs text-red-500 font-medium">
-                {errors.email.message}
+            {authError && (
+              <p className="mt-1.5 text-xs text-red-500 font-medium">
+                {authError}
               </p>
             )}
           </div>
@@ -146,9 +159,7 @@ export const LoginForm: React.FC = () => {
               </a>
             </div>
             <div
-              className={`relative rounded-xl border bg-white/90 input-focus-glow transition-all duration-150 ${
-                errors.password ? "border-red-400" : "border-slate-200/90"
-              }`}
+              className="relative rounded-xl border border-slate-200/90 bg-white/90 input-focus-glow transition-all duration-150"
             >
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                 <Lock className="w-4 h-4" />
@@ -173,11 +184,6 @@ export const LoginForm: React.FC = () => {
                 )}
               </button>
             </div>
-            {errors.password && (
-              <p className="mt-1 text-xs text-red-500 font-medium">
-                {errors.password.message}
-              </p>
-            )}
           </div>
 
           {/* Mantener sesión activa */}

@@ -154,21 +154,20 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
                       <div className="flex items-center gap-3">
                         <div className="relative w-10 h-10 rounded-full overflow-hidden shrink-0 shadow-xs border border-white/80 bg-slate-100">
                           <img
-                            src={patient.photoUrl}
-                            alt={patient.name}
+                            src={patient.imagen || patient.photoUrl}
+                            alt={patient.nombre || patient.name}
                             className="w-full h-full object-cover"
                             onError={(e) => {
-                              // Fallback if image fails to load
                               (e.target as HTMLElement).style.display = "none";
                             }}
                           />
                         </div>
                         <div className="flex flex-col min-w-0">
                           <span className="text-sm font-bold text-on-surface hover:text-primary transition-colors cursor-pointer truncate">
-                            {patient.name}
+                            {patient.nombre || patient.name}
                           </span>
                           <span className="text-[11px] font-mono text-on-surface-variant tracking-wider">
-                            {patient.chipId}
+                            {patient.chipId || `#CHIP-${patient.id.slice(0, 4)}`}
                           </span>
                         </div>
                       </div>
@@ -179,31 +178,34 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <Badge
                           variant={
-                            patient.species === "Canino" ? "ice" : "secondary"
+                            (patient.especie || patient.species) === "Canino"
+                              ? "ice"
+                              : "secondary"
                           }
                           className="font-semibold text-xs px-2 py-0.5"
                         >
-                          {patient.species}
+                          {patient.especie || patient.species}
                         </Badge>
                         <span className="text-xs text-on-surface-variant font-medium">
-                          {patient.breed}
+                          {patient.raza || patient.breed}
                         </span>
                       </div>
                     </TableCell>
 
                     {/* Age & Gender */}
                     <TableCell className="py-3 px-3 text-xs text-on-surface font-medium whitespace-nowrap">
-                      {patient.age} • {patient.gender}
+                      {patient.edad || patient.age}
+                      {patient.gender ? ` • ${patient.gender}` : ""}
                     </TableCell>
 
                     {/* Owner Name & Contact */}
                     <TableCell className="py-3 px-3">
                       <div className="flex flex-col">
                         <span className="text-xs font-semibold text-on-surface">
-                          {patient.ownerName}
+                          {patient.propietario || patient.ownerName}
                         </span>
                         <span className="text-[11px] text-on-surface-variant">
-                          {patient.ownerContact}
+                          {patient.ownerContact || "+34 600 000 000"}
                         </span>
                       </div>
                     </TableCell>
@@ -212,17 +214,17 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
                     <TableCell className="py-3 px-3">
                       <div className="flex flex-col">
                         <span className="text-xs font-semibold text-on-surface">
-                          {patient.lastVisit}
+                          {patient.lastVisit || "Reciente"}
                         </span>
                         <span className="text-[11px] text-on-surface-variant">
-                          {patient.lastVisitType}
+                          {patient.lastVisitType || "Chequeo"}
                         </span>
                       </div>
                     </TableCell>
 
                     {/* Status Badge */}
                     <TableCell className="py-3 px-3 whitespace-nowrap">
-                      {getStatusBadge(patient.status)}
+                      {getStatusBadge((patient.estado as any) || patient.status)}
                     </TableCell>
 
                     {/* Action Buttons */}
@@ -272,26 +274,26 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 shadow-xs border border-white bg-slate-100">
                     <img
-                      src={patient.photoUrl}
-                      alt={patient.name}
+                      src={patient.imagen || patient.photoUrl}
+                      alt={patient.nombre || patient.name}
                       className="w-full h-full object-cover"
                     />
                   </div>
                   <div className="min-w-0">
                     <h4 className="text-sm font-bold text-on-surface truncate">
-                      {patient.name}
+                      {patient.nombre || patient.name}
                     </h4>
                     <p className="text-[11px] font-mono text-on-surface-variant">
-                      {patient.chipId}
+                      {patient.chipId || `#CHIP-${patient.id.slice(0, 4)}`}
                     </p>
                     <div className="flex items-center gap-1 mt-1">
-                      {patient.species === "Canino" ? (
+                      {(patient.especie || patient.species) === "Canino" ? (
                         <PawPrint className="w-3 h-3 text-primary" />
                       ) : (
                         <Cat className="w-3 h-3 text-secondary" />
                       )}
                       <span className="text-[11px] text-on-surface-variant truncate">
-                        {patient.breed}
+                        {patient.raza || patient.breed}
                       </span>
                     </div>
                   </div>
@@ -301,36 +303,37 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
                   <div className="flex justify-between">
                     <span>Edad:</span>
                     <strong className="text-on-surface">
-                      {patient.age} • {patient.gender}
+                      {patient.edad || patient.age}
+                      {patient.gender ? ` • ${patient.gender}` : ""}
                     </strong>
                   </div>
                   <div className="flex justify-between">
                     <span>Tutor:</span>
                     <strong className="text-on-surface truncate max-w-[120px]">
-                      {patient.ownerName}
+                      {patient.propietario || patient.ownerName}
                     </strong>
                   </div>
                   <div className="flex justify-between">
                     <span>Última visita:</span>
                     <span className="text-on-surface font-medium">
-                      {patient.lastVisit}
+                      {patient.lastVisit || "Reciente"}
                     </span>
                   </div>
                 </div>
               </div>
 
               <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                {getStatusBadge(patient.status)}
+                {getStatusBadge((patient.estado as any) || patient.status)}
                 <div className="flex items-center gap-1">
                   <button
                     type="button"
-                    className="p-1 rounded-lg text-on-surface-variant hover:text-primary transition-colors"
+                    className="p-1 rounded-lg text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
                   >
                     <FolderOpen className="w-4 h-4" />
                   </button>
                   <button
                     type="button"
-                    className="p-1 rounded-lg text-on-surface-variant hover:text-primary transition-colors"
+                    className="p-1 rounded-lg text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
                   >
                     <Calendar className="w-4 h-4" />
                   </button>

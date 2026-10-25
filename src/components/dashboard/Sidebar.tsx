@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   PawPrint,
@@ -9,11 +9,13 @@ import {
   Wallet,
   BarChart3,
   Settings,
-  User,
+  User as UserIcon,
   X,
   LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useUsers } from "@/hooks/useUsers";
+import { confirmLogoutAlert } from "@/lib/sweetalert";
 
 interface SidebarProps {
   isOpen?: boolean;
@@ -22,6 +24,16 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { currentUser, logout } = useUsers();
+
+  const handleLogout = async () => {
+    const confirmed = await confirmLogoutAlert();
+    if (confirmed) {
+      logout();
+      navigate("/login");
+    }
+  };
 
   const navItems = [
     { label: "Panel principal", path: "/dashboard", icon: LayoutDashboard },
@@ -134,29 +146,38 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
             <span>Configuración</span>
           </Link>
 
-          {/* Doctor Profile Card */}
+          {/* User Profile Card */}
           <div className="flex items-center justify-between p-2 rounded-xl bg-surface-container-low border border-white/60">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0 text-white shadow-xs">
-                <User className="w-4 h-4 text-white" />
+              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0 overflow-hidden text-white shadow-xs border border-white">
+                {currentUser.image ? (
+                  <img
+                    src={currentUser.image}
+                    alt={`${currentUser.firstName} ${currentUser.lastName}`}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <UserIcon className="w-4 h-4 text-white" />
+                )}
               </div>
               <div className="flex flex-col min-w-0">
                 <span className="text-xs font-semibold text-on-surface truncate">
-                  Dra. Eleanor Vance
+                  {currentUser.firstName} {currentUser.lastName}
                 </span>
-                <span className="text-[11px] font-medium text-on-surface-variant truncate">
-                  Directora Médica
+                <span className="text-[10px] font-medium text-on-surface-variant truncate">
+                  {currentUser.role.toUpperCase()} • {currentUser.email}
                 </span>
               </div>
             </div>
 
-            <Link
-              to="/login"
+            <button
+              type="button"
+              onClick={handleLogout}
               title="Cerrar sesión"
-              className="p-1.5 rounded-lg text-on-surface-variant hover:text-error hover:bg-error-container/30 transition-colors"
+              className="p-1.5 rounded-lg text-on-surface-variant hover:text-error hover:bg-error-container/30 transition-colors cursor-pointer"
             >
               <LogOut className="w-4 h-4" />
-            </Link>
+            </button>
           </div>
         </div>
       </aside>
