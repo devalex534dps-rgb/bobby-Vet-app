@@ -1,0 +1,82 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+.github
+
+# Dependencies (installed freshly inside the Docker build)
+node_modules
+.pnp
+.pnp.js
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+
+# Build outputs & TypeScript build cache
+dist
+dist-ssr
+build
+out
+*.tsbuildinfo
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.development*
+.env.test*
+.env.production*
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Testing & Coverage
+coverage
+.nyc_output
+test-results
+playwright-report
+cypress/videos
+cypress/screenshots
+
+# Temporary files & Caches
+.cache
+.turbo
+.eslintcache
+.stylelintcache
+*.tmp
+*.temp
+
+# IDE & Editor files
+.idea
+.vscode
+*.sublime-workspace
+*.sublime-project
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.fleet
+
+# Operating System files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+[Dd]esktop.ini
+
+# Docker & Documentation
+Dockerfile*
+docker-compose*
+.dockerignore
+README.md
+LICENSE
