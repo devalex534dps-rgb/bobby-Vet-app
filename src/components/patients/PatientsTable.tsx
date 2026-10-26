@@ -1,12 +1,13 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FolderOpen,
-  Calendar,
-  MoreVertical,
   ChevronLeft,
   ChevronRight,
   PawPrint,
   Cat,
+  Edit3,
+  Trash2,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -24,14 +25,29 @@ import { cn } from "@/lib/utils";
 interface PatientsTableProps {
   patients: Patient[];
   viewMode?: "table" | "grid";
+  onViewPatient?: (patient: Patient) => void;
+  onEditPatient?: (patient: Patient) => void;
+  onDeletePatient?: (patient: Patient) => void;
 }
 
 export const PatientsTable: React.FC<PatientsTableProps> = ({
   patients,
   viewMode = "table",
+  onViewPatient,
+  onEditPatient,
+  onDeletePatient,
 }) => {
+  const navigate = useNavigate();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [rowsPerPage, setRowsPerPage] = useState("10");
+
+  const handleView = (patient: Patient) => {
+    if (onViewPatient) {
+      onViewPatient(patient);
+    } else {
+      navigate(`/patients/${patient.id}`);
+    }
+  };
 
   const toggleSelectAll = () => {
     if (selectedIds.length === patients.length) {
@@ -151,8 +167,11 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
 
                     {/* Patient Photo, Name & Chip ID */}
                     <TableCell className="py-3 px-3">
-                      <div className="flex items-center gap-3">
-                        <div className="relative w-10 h-10 rounded-full overflow-hidden shrink-0 shadow-xs border border-white/80 bg-slate-100">
+                      <div
+                        className="flex items-center gap-3 cursor-pointer group"
+                        onClick={() => handleView(patient)}
+                      >
+                        <div className="relative w-10 h-10 rounded-full overflow-hidden shrink-0 shadow-xs border border-white/80 bg-slate-100 group-hover:ring-2 group-hover:ring-primary/40 transition-all">
                           <img
                             src={patient.imagen || patient.photoUrl}
                             alt={patient.nombre || patient.name}
@@ -163,7 +182,7 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
                           />
                         </div>
                         <div className="flex flex-col min-w-0">
-                          <span className="text-sm font-bold text-on-surface hover:text-primary transition-colors cursor-pointer truncate">
+                          <span className="text-sm font-bold text-on-surface group-hover:text-primary transition-colors truncate">
                             {patient.nombre || patient.name}
                           </span>
                           <span className="text-[11px] font-mono text-on-surface-variant tracking-wider">
@@ -232,27 +251,30 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
                       <div className="flex items-center justify-end gap-1">
                         <button
                           type="button"
+                          onClick={() => handleView(patient)}
                           className="p-1.5 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors cursor-pointer"
-                          title="Ver Historial"
-                          aria-label="Ver Historial"
+                          title="Ver Perfil"
+                          aria-label="Ver Perfil"
                         >
                           <FolderOpen className="w-4 h-4" />
                         </button>
                         <button
                           type="button"
+                          onClick={() => onEditPatient?.(patient)}
                           className="p-1.5 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors cursor-pointer"
-                          title="Agendar Cita"
-                          aria-label="Agendar Cita"
+                          title="Editar Paciente"
+                          aria-label="Editar"
                         >
-                          <Calendar className="w-4 h-4" />
+                          <Edit3 className="w-4 h-4" />
                         </button>
                         <button
                           type="button"
-                          className="p-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors cursor-pointer"
-                          title="Más opciones"
-                          aria-label="Más opciones"
+                          onClick={() => onDeletePatient?.(patient)}
+                          className="p-1.5 rounded-lg text-on-surface-variant hover:text-error hover:bg-error-container/30 transition-colors cursor-pointer"
+                          title="Eliminar Paciente"
+                          aria-label="Eliminar"
                         >
-                          <MoreVertical className="w-4 h-4" />
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </TableCell>
@@ -271,8 +293,11 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
               className="p-4 rounded-2xl bg-surface-container-lowest/80 border border-white/80 shadow-xs hover:shadow-md transition-all flex flex-col justify-between"
             >
               <div>
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 shadow-xs border border-white bg-slate-100">
+                <div
+                  className="flex items-center gap-3 mb-3 cursor-pointer group"
+                  onClick={() => handleView(patient)}
+                >
+                  <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 shadow-xs border border-white bg-slate-100 group-hover:ring-2 group-hover:ring-primary/40 transition-all">
                     <img
                       src={patient.imagen || patient.photoUrl}
                       alt={patient.nombre || patient.name}
@@ -280,7 +305,7 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
                     />
                   </div>
                   <div className="min-w-0">
-                    <h4 className="text-sm font-bold text-on-surface truncate">
+                    <h4 className="text-sm font-bold text-on-surface group-hover:text-primary transition-colors truncate">
                       {patient.nombre || patient.name}
                     </h4>
                     <p className="text-[11px] font-mono text-on-surface-variant">
@@ -327,15 +352,27 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
                 <div className="flex items-center gap-1">
                   <button
                     type="button"
+                    onClick={() => handleView(patient)}
                     className="p-1 rounded-lg text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
+                    title="Ver Perfil"
                   >
                     <FolderOpen className="w-4 h-4" />
                   </button>
                   <button
                     type="button"
+                    onClick={() => onEditPatient?.(patient)}
                     className="p-1 rounded-lg text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
+                    title="Editar"
                   >
-                    <Calendar className="w-4 h-4" />
+                    <Edit3 className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onDeletePatient?.(patient)}
+                    className="p-1 rounded-lg text-on-surface-variant hover:text-error hover:bg-error-container/30 transition-colors cursor-pointer"
+                    title="Eliminar"
+                  >
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>

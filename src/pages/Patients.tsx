@@ -5,9 +5,13 @@ import { PatientHeader } from "@/components/patients/PatientHeader";
 import { PatientsKpiCards } from "@/components/patients/PatientsKpiCards";
 import { PatientsToolbar } from "@/components/patients/PatientsToolbar";
 import { PatientsTable } from "@/components/patients/PatientsTable";
-import { useCats } from "@/hooks/useCats";
-import { useDogs } from "@/hooks/useDogs";
-import type { Patient, PatientFilterTab, PatientStatus } from "@/components/patients/types";
+import {
+  usePatientsData,
+  PatientEditModal,
+  confirmDeletePatientAlert,
+  showSuccessToast,
+} from "@/components/patient-profile";
+import type { Patient, PatientFilterTab } from "@/components/patients/types";
 import { Loader2 } from "lucide-react";
 
 export const Patients: React.FC = () => {
@@ -18,223 +22,53 @@ export const Patients: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
 
-  // Real APIs via TanStack Query hooks
-  const { cats, isLoading: isLoadingCats } = useCats(6);
-  const { dogs, isLoading: isLoadingDogs } = useDogs([
-    "retriever",
-    "germanshepherd",
-    "bulldog",
-    "poodle",
-    "husky",
-    "beagle",
-  ]);
+  // Synchronized unified patient data source with TanStack Query
+  const {
+    patients,
+    isLoading,
+    createPatient,
+    updatePatient,
+    deletePatient,
+  } = usePatientsData();
 
-  // Combine real dogs and cats into the required patient structure:
-  // { id, nombre, especie, raza, propietario, edad, estado, imagen }
-  const realPatients = useMemo<Patient[]>(() => {
-    const list: Patient[] = [];
+  // Modal State for Create and Edit
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<"create" | "edit">("create");
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
 
-    // Dog profiles from dog.ceo API
-    const dogNames = ["Luna", "Rocky", "Bella", "Coco", "Thor", "Max"];
-    const dogBreedsDisplay: Record<string, string> = {
-      retriever: "Golden Retriever",
-      germanshepherd: "Pastor Alemán",
-      bulldog: "Bulldog Francés",
-      poodle: "Caniche Toy",
-      husky: "Husky Siberiano",
-      beagle: "Beagle",
-    };
-    const dogOwners = [
-      "Sarah Jenkins",
-      "Carlos Morales",
-      "Elena Rostova",
-      "Sofía Valenzuela",
-      "Patricia Méndez",
-      "Roberto Silva",
-    ];
-    const dogContacts = [
-      "+34 612 345 678",
-      "+34 644 987 654",
-      "+34 689 123 456",
-      "sofia.v@cloud.com",
-      "patricia.m@mail.com",
-      "+34 670 112 334",
-    ];
-    const dogAges = ["3 años", "1 año", "4 años", "6 años", "4 años", "2 años"];
-    const dogGenders = ["Hembra", "Macho", "Hembra (E)", "Hembra", "Macho", "Macho"];
-    const dogStatuses: PatientStatus[] = [
-      "Al día",
-      "Al día",
-      "En seguimiento",
-      "Al día",
-      "En recuperación",
-      "En tratamiento",
-    ];
-    const dogVisits = [
-      "Hace 3 días",
-      "10 Oct",
-      "14 Oct",
-      "8 Oct",
-      "Ayer",
-      "Hace 2 días",
-    ];
-    const dogVisitTypes = [
-      "Chequeo Bienestar",
-      "Traumatología",
-      "Dermatología",
-      "Cardiología",
-      "Postoperatorio",
-      "Vacunación",
-    ];
+  const handleOpenCreate = () => {
+    setSelectedPatient(null);
+    setModalMode("create");
+    setIsModalOpen(true);
+  };
 
-    dogs.forEach((dog, idx) => {
-      const nombre = dogNames[idx % dogNames.length];
-      const raza =
-        dogBreedsDisplay[dog.breed] ||
-        dog.breed.charAt(0).toUpperCase() + dog.breed.slice(1);
-      const propietario = dogOwners[idx % dogOwners.length];
-      const edad = dogAges[idx % dogAges.length];
-      const estado = dogStatuses[idx % dogStatuses.length];
-      const imagen = dog.image;
+  const handleOpenEdit = (patient: Patient) => {
+    setSelectedPatient(patient);
+    setModalMode("edit");
+    setIsModalOpen(true);
+  };
 
-      list.push({
-        id: `dog-${dog.breed}-${idx}`,
-        nombre,
-        especie: "Canino",
-        raza,
-        propietario,
-        edad,
-        estado,
-        imagen,
-        // UI fields
-        name: nombre,
-        species: "Canino",
-        breed: raza,
-        ownerName: propietario,
-        age: edad,
-        gender: dogGenders[idx % dogGenders.length],
-        status: estado,
-        statusVariant:
-          estado === "Al día"
-            ? "success"
-            : estado === "En tratamiento"
-            ? "warning"
-            : estado === "En seguimiento"
-            ? "primary"
-            : estado === "Vacuna pendiente"
-            ? "secondary"
-            : "ice",
-        photoUrl: imagen,
-        chipId: `#CHIP-${8200 + idx}-P`,
-        ownerContact: dogContacts[idx % dogContacts.length],
-        lastVisit: dogVisits[idx % dogVisits.length],
-        lastVisitType: dogVisitTypes[idx % dogVisitTypes.length],
-      });
-    });
+  const handleDeletePatient = async (patient: Patient) => {
+    const confirmed = await confirmDeletePatientAlert(patient.nombre || patient.name);
+    if (confirmed) {
+      deletePatient(patient.id);
+      showSuccessToast("Paciente Eliminado", `${patient.nombre} ha sido removido del directorio.`);
+    }
+  };
 
-    // Cat profiles from cataas.com API
-    const catNames = ["Milo", "Oliver", "Simba", "Cleo", "Felix", "Nala"];
-    const catBreedsList = [
-      "British Shorthair",
-      "Maine Coon",
-      "Siamés",
-      "Persa",
-      "Bengalí",
-      "Común Europeo",
-    ];
-    const catOwners = [
-      "Marcus Chen",
-      "David Miller",
-      "Andrés Gómez",
-      "Laura Martínez",
-      "Fernando Díaz",
-      "Isabel Torres",
-    ];
-    const catContacts = [
-      "marcus.c@email.com",
-      "d.miller@vet.net",
-      "+34 655 432 109",
-      "+34 633 221 445",
-      "+34 611 789 012",
-      "isabel.t@cloud.com",
-    ];
-    const catAges = ["2 años", "5 años", "3 años", "1 año", "4 años", "2 años"];
-    const catGenders = ["Macho", "Macho", "Macho", "Hembra", "Macho", "Hembra"];
-    const catStatuses: PatientStatus[] = [
-      "En tratamiento",
-      "Vacuna pendiente",
-      "Al día",
-      "En seguimiento",
-      "Al día",
-      "Vacuna pendiente",
-    ];
-    const catVisits = [
-      "Hace 5 días",
-      "12 Oct",
-      "5 Oct",
-      "Hace 1 semana",
-      "2 Oct",
-      "28 Sep",
-    ];
-    const catVisitTypes = [
-      "Limpieza Dental",
-      "Refuerzo séxtuple",
-      "Desparasitación",
-      "Control de Peso",
-      "Consulta General",
-      "Vacunación",
-    ];
-
-    cats.forEach((cat, idx) => {
-      const catId = cat.id || cat._id || `cat-${idx}`;
-      const nombre = catNames[idx % catNames.length];
-      const raza = catBreedsList[idx % catBreedsList.length];
-      const propietario = catOwners[idx % catOwners.length];
-      const edad = catAges[idx % catAges.length];
-      const estado = catStatuses[idx % catStatuses.length];
-      const imagen = `https://cataas.com/cat/${catId}`;
-
-      list.push({
-        id: `cat-${catId}`,
-        nombre,
-        especie: "Felino",
-        raza,
-        propietario,
-        edad,
-        estado,
-        imagen,
-        // UI fields
-        name: nombre,
-        species: "Felino",
-        breed: raza,
-        ownerName: propietario,
-        age: edad,
-        gender: catGenders[idx % catGenders.length],
-        status: estado,
-        statusVariant:
-          estado === "Al día"
-            ? "success"
-            : estado === "En tratamiento"
-            ? "warning"
-            : estado === "En seguimiento"
-            ? "primary"
-            : estado === "Vacuna pendiente"
-            ? "secondary"
-            : "ice",
-        photoUrl: imagen,
-        chipId: `#CHIP-${4400 + idx}-F`,
-        ownerContact: catContacts[idx % catContacts.length],
-        lastVisit: catVisits[idx % catVisits.length],
-        lastVisitType: catVisitTypes[idx % catVisitTypes.length],
-      });
-    });
-
-    return list;
-  }, [dogs, cats]);
+  const handleSaveModal = (data: any) => {
+    if (modalMode === "create") {
+      const created = createPatient(data);
+      showSuccessToast("Paciente Creado", `${created.nombre} ha sido agregado exitosamente.`);
+    } else if (selectedPatient) {
+      updatePatient(selectedPatient.id, data);
+      showSuccessToast("Paciente Actualizado", `Los datos de ${data.nombre} han sido guardados.`);
+    }
+  };
 
   // Filter patients based on tab, search query, species, and clinical status
   const filteredPatients = useMemo(() => {
-    return realPatients.filter((patient) => {
+    return patients.filter((patient: Patient) => {
       // Tab filter
       if (currentTab === "vacunas" && patient.estado !== "Vacuna pendiente") {
         return false;
@@ -283,7 +117,7 @@ export const Patients: React.FC = () => {
 
       return true;
     });
-  }, [realPatients, currentTab, searchQuery, speciesFilter, statusFilter]);
+  }, [patients, currentTab, searchQuery, speciesFilter, statusFilter]);
 
   const handleResetFilters = () => {
     setCurrentTab("todos");
@@ -291,8 +125,6 @@ export const Patients: React.FC = () => {
     setSpeciesFilter("all");
     setStatusFilter("all");
   };
-
-  const isLoading = isLoadingCats && isLoadingDogs;
 
   return (
     <div className="min-h-screen bg-surface font-sans text-on-surface antialiased selection:bg-primary selection:text-white">
@@ -322,7 +154,7 @@ export const Patients: React.FC = () => {
               />
 
               {/* 1. Page Header: Breadcrumb & Executive Actions */}
-              <PatientHeader />
+              <PatientHeader onNewPatient={handleOpenCreate} />
 
               {/* 2. KPI Metrics Ribbon (4 Cards) */}
               <PatientsKpiCards />
@@ -343,7 +175,7 @@ export const Patients: React.FC = () => {
               />
 
               {/* Loading Indicator or Data Table */}
-              {isLoading && realPatients.length === 0 ? (
+              {isLoading && patients.length === 0 ? (
                 <div className="mt-6 flex flex-col items-center justify-center p-12 rounded-2xl bg-glass-fill backdrop-blur-xl border border-white/80 shadow-sm">
                   <Loader2 className="w-8 h-8 text-primary animate-spin mb-3" />
                   <p className="text-sm font-semibold text-on-surface">
@@ -355,12 +187,23 @@ export const Patients: React.FC = () => {
                 <PatientsTable
                   patients={filteredPatients}
                   viewMode={viewMode}
+                  onEditPatient={handleOpenEdit}
+                  onDeletePatient={handleDeletePatient}
                 />
               )}
             </div>
           </div>
         </main>
       </div>
+
+      {/* Patient Create / Edit Modal */}
+      <PatientEditModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSaveModal}
+        patient={selectedPatient}
+        mode={modalMode}
+      />
     </div>
   );
 };
