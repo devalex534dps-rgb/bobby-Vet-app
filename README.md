@@ -73,6 +73,9 @@ Uso:
 
 ---
 
+## Diseño en Figma
+URL: https://www.figma.com/design/YXihT06njml4nVc5ZWtTG5/Mock-Up-A7?node-id=0-1&t=fq5T3sHevdfVPiwW-1
+
 ## Proyecto Desplegado
 
-URL: http://179.197.81.104/login
+URL: http://179.197.81.104/t3_act8_eq13/
