@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   FolderOpen,
-  ChevronLeft,
-  ChevronRight,
   PawPrint,
   Cat,
   Edit3,
@@ -39,7 +37,6 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
 }) => {
   const navigate = useNavigate();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [rowsPerPage, setRowsPerPage] = useState("10");
 
   const handleView = (patient: Patient) => {
     if (onViewPatient) {
@@ -380,75 +377,6 @@ export const PatientsTable: React.FC<PatientsTableProps> = ({
           ))}
         </div>
       )}
-
-      {/* Table Footer with Pagination Controls */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 bg-surface-container-low/50 border-t border-slate-200/50">
-        <div className="flex items-center gap-4 text-xs text-on-surface-variant">
-          <span>
-            Mostrando <strong className="text-on-surface">1–8</strong> de{" "}
-            <strong className="text-on-surface">4,829</strong> pacientes
-          </span>
-          <div className="h-4 w-px bg-surface-container-highest hidden sm:block" />
-          <div className="flex items-center gap-1.5 text-xs text-on-surface-variant">
-            <span>Filas por página:</span>
-            <select
-              value={rowsPerPage}
-              onChange={(e) => setRowsPerPage(e.target.value)}
-              className="bg-surface-container-lowest rounded-md px-2 py-0.5 text-on-surface text-xs focus:outline-none cursor-pointer border border-slate-200/60 shadow-xs"
-            >
-              <option value="10">10</option>
-              <option value="25">25</option>
-              <option value="50">50</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Pagination Controls */}
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            disabled
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest transition-colors text-xs font-semibold disabled:opacity-50 cursor-not-allowed"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            <span>Anterior</span>
-          </button>
-          <button
-            type="button"
-            className="w-7 h-7 rounded-lg bg-primary-container text-white text-xs font-bold flex items-center justify-center shadow-xs"
-          >
-            1
-          </button>
-          <button
-            type="button"
-            className="w-7 h-7 rounded-lg text-on-surface-variant hover:bg-surface-container-lowest text-xs font-medium flex items-center justify-center transition-colors cursor-pointer"
-          >
-            2
-          </button>
-          <button
-            type="button"
-            className="w-7 h-7 rounded-lg text-on-surface-variant hover:bg-surface-container-lowest text-xs font-medium flex items-center justify-center transition-colors cursor-pointer"
-          >
-            3
-          </button>
-          <span className="px-1 text-on-surface-variant text-xs font-bold">
-            ...
-          </span>
-          <button
-            type="button"
-            className="w-7 h-7 rounded-lg text-on-surface-variant hover:bg-surface-container-lowest text-xs font-medium flex items-center justify-center transition-colors cursor-pointer"
-          >
-            604
-          </button>
-          <button
-            type="button"
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest transition-colors text-xs font-semibold cursor-pointer"
-          >
-            <span>Siguiente</span>
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
     </Card>
   );
 };
