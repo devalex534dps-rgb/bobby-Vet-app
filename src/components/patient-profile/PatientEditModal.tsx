@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { X, PawPrint, Cat, CheckCircle2 } from "lucide-react";
 import type { Patient, PatientStatus, PatientSpecies } from "@/components/patients/types";
 import { Button } from "@/components/ui/button";
+import { StyledSelect } from "@/components/ui/StyledSelect";
 
 interface PatientEditModalProps {
   isOpen: boolean;
@@ -253,17 +254,11 @@ export const PatientEditModal: React.FC<PatientEditModalProps> = ({
             <label className="block text-xs font-semibold text-on-surface mb-1">
               Estado Clínico
             </label>
-            <select
+            <StyledSelect
               value={estado}
-              onChange={(e) => setEstado(e.target.value as PatientStatus)}
-              className="w-full px-3 py-2 text-sm rounded-xl bg-surface-container-lowest border border-slate-200/80 text-on-surface focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
-            >
-              {AVAILABLE_STATUSES.map((st) => (
-                <option key={st} value={st}>
-                  {st}
-                </option>
-              ))}
-            </select>
+              onChange={(val) => setEstado(val as PatientStatus)}
+              options={AVAILABLE_STATUSES.map((st) => ({ value: st, label: st }))}
+            />
           </div>
 
           {/* Optional Imagen URL */}
