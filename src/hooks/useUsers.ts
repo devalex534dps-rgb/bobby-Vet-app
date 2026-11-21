@@ -1,68 +1,73 @@
 import { useState, useCallback } from "react";
-import { useQuery } from "@tanstack/react-query";
 import {
-  fetchUsers,
   getActiveUser,
-  setActiveUser,
-  clearActiveUser,
-  findUserByIdentifier,
+  loginWithBackend,
+  registerWithBackend,
+  logoutWithBackend,
+  changePasswordWithBackend,
   type User,
 } from "@/services/users";
+import { getAccessToken } from "@/services/apiClient";
 
 export const useUsers = () => {
   const [currentUser, setCurrentUserState] = useState<User>(() => getActiveUser());
 
-  const usersQuery = useQuery({
-    queryKey: ["users"],
-    queryFn: fetchUsers,
-    staleTime: 1000 * 60 * 15, // 15 mins
-  });
+  const isAuthenticated = Boolean(getAccessToken() && currentUser.id);
 
-  const login = useCallback(
-    async (identifier: string): Promise<{ success: boolean; user?: User; error?: string }> => {
-      // Ensure users are loaded
-      let usersList = usersQuery.data;
-      if (!usersList || usersList.length === 0) {
-        try {
-          usersList = await fetchUsers();
-        } catch {
-          return {
-            success: false,
-            error: "Error de conexión al verificar credenciales.",
-          };
-        }
-      }
-
-      const matchedUser = findUserByIdentifier(usersList, identifier);
-
-      if (matchedUser) {
-        setActiveUser(matchedUser);
-        setCurrentUserState(matchedUser);
-        return { success: true, user: matchedUser };
-      }
-
+  const login = useCallback(async (email: string, password: string) => {
+    try {
+      const user = await loginWithBackend(email, password);
+      setCurrentUserState(user);
+      return { success: true, user };
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Error de conexión con el servidor.";
       return {
         success: false,
-        error: "Usuario o correo electrónico no encontrado.",
+        error: message.includes("Failed to fetch")
+          ? "No se pudo conectar con el servidor backend (:8080)."
+          : message,
       };
+    }
+  }, []);
+
+  const register = useCallback(
+    async (body: { fullName: string; email: string; password: string; phone: string }) => {
+      try {
+        const user = await registerWithBackend(body);
+        setCurrentUserState(user);
+        return { success: true, user };
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Error al registrar usuario.";
+        return { success: false, error: message };
+      }
     },
-    [usersQuery.data]
+    []
   );
 
-  const logout = useCallback(() => {
-    clearActiveUser();
+  const changePassword = useCallback(async (currentPassword: string, newPassword: string) => {
+    try {
+      await changePasswordWithBackend(currentPassword, newPassword);
+      return { success: true };
+    } catch (err) {
+      return {
+        success: false,
+        error: err instanceof Error ? err.message : "No se pudo actualizar la contraseña.",
+      };
+    }
+  }, []);
+
+  const logout = useCallback(async () => {
+    await logoutWithBackend();
     setCurrentUserState(getActiveUser());
   }, []);
 
   return {
-    users: usersQuery.data ?? [],
-    isLoading: usersQuery.isLoading,
-    isError: usersQuery.isError,
-    error: usersQuery.error,
     currentUser,
+    isAuthenticated,
     login,
+    register,
+    changePassword,
     logout,
-    refetchUsers: usersQuery.refetch,
   };
 };
 

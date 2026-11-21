@@ -59,3 +59,29 @@ export async function confirmLogoutAlert(): Promise<boolean> {
 
   return result.isConfirmed;
 }
+
+export async function confirmDeleteAlert(targetLabel: string): Promise<boolean> {
+  const result = await bobbySwal.fire({
+    title: "¿Confirmar acción?",
+    text: `¿Estás seguro de que deseas eliminar o desactivar ${targetLabel}?`,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Sí, confirmar",
+    cancelButtonText: "Cancelar",
+    reverseButtons: true,
+    focusCancel: true,
+  });
+  return result.isConfirmed;
+}
+
+export function showToast(icon: "success" | "error" | "info" | "warning", title: string): void {
+  Swal.fire({
+    toast: true,
+    position: "top-end",
+    icon,
+    title,
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+  });
+}

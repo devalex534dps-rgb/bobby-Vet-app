@@ -295,4 +295,54 @@
   animation: bobby-icon-pop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+/* Estilo coherente para selects dentro de SweetAlert2 */
+.swal2-select {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background-color: #f9f9ff !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23024594' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 0.85rem center !important;
+  background-size: 14px !important;
+  border: 1px solid rgba(195, 198, 211, 0.7) !important;
+  border-radius: 0.75rem !important;
+  padding: 0.625rem 2.25rem 0.625rem 0.875rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  color: #0c1b33 !important;
+  box-shadow: 0 1px 2px rgba(2, 69, 148, 0.05) !important;
+  cursor: pointer !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease !important;
+}
+
+.swal2-select:hover {
+  border-color: rgba(2, 69, 148, 0.45) !important;
+  background-color: #ffffff !important;
+}
+
+.swal2-select:focus {
+  outline: none !important;
+  border-color: #024594 !important;
+  box-shadow: 0 0 0 3px rgba(2, 69, 148, 0.16) !important;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Cursor personalizado: Patita de perro normal y sacando garras al hacer click */
+html,
+body,
+* {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cg transform='rotate(-15 16 16)'%3E%3Cellipse cx='16' cy='21' rx='6.2' ry='5.2' fill='%23024594' stroke='%23ffffff' stroke-width='1.5'/%3E%3Cellipse cx='9' cy='14' rx='2.4' ry='3.2' fill='%232c5ead' stroke='%23ffffff' stroke-width='1.3'/%3E%3Cellipse cx='13.5' cy='10.5' rx='2.4' ry='3.4' fill='%232c5ead' stroke='%23ffffff' stroke-width='1.3'/%3E%3Cellipse cx='18.8' cy='10.5' rx='2.4' ry='3.4' fill='%232c5ead' stroke='%23ffffff' stroke-width='1.3'/%3E%3Cellipse cx='23' cy='14' rx='2.4' ry='3.2' fill='%232c5ead' stroke='%23ffffff' stroke-width='1.3'/%3E%3C/g%3E%3C/svg%3E") 12 10, auto !important;
+}
+
+html:active,
+body:active,
+*:active {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cg transform='rotate(-15 16 16)'%3E%3Cpath d='M8.5 11 L7 6 L10.2 10 Z' fill='%231e293b' stroke='%23ffffff' stroke-width='0.9'/%3E%3Cpath d='M13 7.5 L12.5 2.5 L15 7 Z' fill='%231e293b' stroke='%23ffffff' stroke-width='0.9'/%3E%3Cpath d='M18.5 7 L19.8 2.5 L20.8 7.5 Z' fill='%231e293b' stroke='%23ffffff' stroke-width='0.9'/%3E%3Cpath d='M22.2 10.5 L25.5 6.5 L24 11.5 Z' fill='%231e293b' stroke='%23ffffff' stroke-width='0.9'/%3E%3Cellipse cx='16' cy='21.5' rx='6.2' ry='5.2' fill='%23024594' stroke='%23ffffff' stroke-width='1.5'/%3E%3Cellipse cx='9' cy='14.2' rx='2.4' ry='3.2' fill='%231591dc' stroke='%23ffffff' stroke-width='1.3'/%3E%3Cellipse cx='13.5' cy='10.8' rx='2.4' ry='3.4' fill='%231591dc' stroke='%23ffffff' stroke-width='1.3'/%3E%3Cellipse cx='18.8' cy='10.8' rx='2.4' ry='3.4' fill='%231591dc' stroke='%23ffffff' stroke-width='1.3'/%3E%3Cellipse cx='23' cy='14.2' rx='2.4' ry='3.2' fill='%231591dc' stroke='%23ffffff' stroke-width='1.3'/%3E%3C/g%3E%3C/svg%3E") 12 6, pointer !important;
+}
+
 
