@@ -37,6 +37,7 @@ out/
 !.env.example
 !.env.template
 backend/src/main/resources/application.properties
+backend/src/main/resources/application.yml
 
 # Testing & Coverage
 coverage/
@@ -60,6 +61,9 @@ cypress/screenshots/
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
+frontend/.vscode/*
+!frontend/.vscode/extensions.json
+!frontend/.vscode/settings.json
 *.sublime-workspace
 *.sublime-project
 *.suo
