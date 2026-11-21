@@ -1,81 +1,54 @@
-# Veterinaria Bobby
+# Bobby VetCare
 
-## Estudiante
-
-Edwin Alexis Esperanza Chavez
-Felix Eliel Olivera Jimenez
----
-
-## Descripción
-
-Veterinaria Bobby es una aplicación web SaaS para la gestión de clínicas veterinarias.
-
-Actualmente incluye:
-
-- Inicio de sesión
-- Dashboard principal
-- Gestión de pacientes
-- Perfil de paciente
-- Navegación entre módulos
-- Despliegue en VPS
+## Estudiantes
+- Edwin Alexis Esperanza Chavez
+- Felix Eliel Olivera Jimenez
 
 ---
 
-## APIs Utilizadas
+## Descripción del Proyecto
+**Bobby VetCare** es una aplicación web frontend para la **gestión clínica veterinaria** (portal público para tutores, control de pacientes, agenda de citas, consultas médicas, reporte clínico y administración de usuarios), desarrollada con React 19, TypeScript y Tailwind CSS.
 
-### Usuarios
-
-DummyJSON Users
-
-https://dummyjson.com/users
-
-Uso:
-- Simulación de autenticación
-- Obtención de información de usuario
-- Avatar de perfil
-- Datos de ejemplo para Dashboard
-
-### Gatos
-
-CATAAS
-
-https://cataas.com/api/cats
-
-Uso:
-- Imágenes y datos de pacientes felinos
-
-### Perros
-
-Dog CEO API
-
-https://dog.ceo/api/breeds/list/all
-
-https://dog.ceo/api/breed/{breed}/images/random
-
-Uso:
-- Razas de perros
-- Imágenes de pacientes caninos
+### Ventanas y Módulos del Sistema
+- **Portal de Pacientes (`/`):** Landing pública para tutores con consulta de seguimiento clínico mediante folio.
+- **Acceso Staff (`/login`):** Inicio de sesión para personal clínico (`ADMIN`, `VETERINARIO`).
+- **Dashboard (`/dashboard`):** Resumen operativo con métricas clínicas y accesos rápidos.
+- **Gestión de Pacientes (`/patients`):** Directorio clínico con filtros, búsqueda y exportación.
+- **Perfil del Paciente (`/patients/:id`):** Expediente detallado con historial, citas y edición de datos.
+- **Agenda de Citas (`/citas`):** Programación, filtrado por estado y seguimiento de citas.
+- **Consultas Médicas (`/consultas`):** Registro y gestión de consultas veterinarias.
+- **Reporte de Consulta (`/consultas/:id/reporte`):** Vista clínica para documentar hallazgos, diagnóstico, tratamiento y resumen del expediente en pantalla.
+- **Gestión de Usuarios (`/usuarios`):** Administración de cuentas y roles del sistema.
+- **Perfil de Usuario (`/perfil`):** Información de la sesión activa.
 
 ---
 
-## Tecnologías
-
-- React 19
-- TypeScript
-- Vite
-- Tailwind CSS
-- shadcn/ui
-- React Router DOM
-- TanStack Query
-- Docker
-- Docker Compose
-- Hostinger VPS
+## Tecnologías Utilizadas
+- **Frontend:** React 19, TypeScript, Vite, Tailwind CSS v4
+- **Navegación y Estado:** React Router DOM v7, TanStack Query v5
+- **Formularios y Validación:** React Hook Form, Zod
+- **UI y Experiencia:** Lucide React, Framer Motion, Three.js, SweetAlert2
+- **Despliegue:** Docker, Nginx, Hostinger VPS
 
 ---
 
-## Diseño en Figma
-URL: https://www.figma.com/design/YXihT06njml4nVc5ZWtTG5/Mock-Up-A7?node-id=0-1&t=fq5T3sHevdfVPiwW-1
+## Instalación y Ejecución Local
 
-## Proyecto Desplegado
+```bash
+# 1. Instalar dependencias
+npm install
 
-URL: http://179.197.81.104/t3_act8_eq13/
+# 2. Iniciar servidor de desarrollo
+npm run dev
+
+# 3. Compilar para producción
+npm run build
+```
+
+La aplicación estará disponible en `http://localhost:5173`.
+
+---
+
+## Enlaces del Proyecto
+- **Diseño en Figma:** https://www.figma.com/design/YXihT06njml4nVc5ZWtTG5/Mock-Up-A7?node-id=0-1&t=fq5T3sHevdfVPiwW-1
+- **Proyecto Desplegado:** http://179.197.81.104/t3_act8_eq13/
