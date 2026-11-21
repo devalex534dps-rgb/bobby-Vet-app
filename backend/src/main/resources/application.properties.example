@@ -1,0 +1,41 @@
+spring.application.name=bobby-vetcare-api
+server.port=8080
+server.servlet.context-path=/api/v1
+
+# MySQL 8.0+
+spring.datasource.url=jdbc:mysql://localhost:3306/bobby_vetcare?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Mexico_City
+spring.datasource.username=root
+spring.datasource.password=CHANGE_ME
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# JPA / Hibernate
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.open-in-view=false
+
+# Flyway
+spring.flyway.enabled=false
+
+# JWT (minimo 32 caracteres para HS256)
+app.jwt.secret=CHANGE_ME_AT_LEAST_32_CHARS_SECRET_KEY
+app.jwt.expiration-ms=86400000
+
+# Correo electrónico (Postfix local en VPS)
+spring.mail.host=${MAIL_HOST:localhost}
+spring.mail.port=${MAIL_PORT:25}
+spring.mail.username=${MAIL_USERNAME:}
+spring.mail.password=${MAIL_PASSWORD:}
+spring.mail.properties.mail.smtp.starttls.enable=${MAIL_STARTTLS_ENABLE:false}
+spring.mail.properties.mail.smtp.starttls.required=${MAIL_STARTTLS_REQUIRED:false}
+spring.mail.properties.mail.smtp.connectiontimeout=5000
+spring.mail.properties.mail.smtp.timeout=5000
+spring.mail.properties.mail.smtp.writetimeout=5000
+
+app.mail.from=${MAIL_FROM:no-reply@bobbyvetcare.com}
+app.mail.from-name=${MAIL_FROM_NAME:Bobby VetCare}
+app.mail.reminder-cron=${MAIL_REMINDER_CRON:0 0 8 * * *}
+
+# Twilio WhatsApp & SMS API
+twilio.account-sid=${TWILIO_ACCOUNT_SID:}
+twilio.auth-token=${TWILIO_AUTH_TOKEN:}
+twilio.whatsapp-number=${TWILIO_WHATSAPP_NUMBER:}
+twilio.phone-number=${TWILIO_PHONE_NUMBER:}

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recordatorio de Cita - Bobby VetCare</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f4f7f6;font-family:'Segoe UI',Arial,sans-serif;color:#1f2937;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color:#f4f7f6;padding:32px 16px;">
+        <tr>
+            <td align="center">
+                <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;width:100%;background-color:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e5e7eb;">
+                    <tr>
+                        <td style="background-color:#1d4ed8;padding:24px 32px;color:#ffffff;">
+                            <h1 style="margin:0;font-size:22px;font-weight:700;">Bobby VetCare</h1>
+                            <p style="margin:6px 0 0;font-size:14px;color:#dbeafe;">Recordatorio de próxima cita veterinaria</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding:28px 32px;">
+                            <p style="margin:0 0 16px;font-size:16px;">Hola <strong>{{tutorFullName}}</strong>,</p>
+                            <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#374151;">
+                                Te recordamos que tienes una cita programada para <strong>{{patientName}}</strong> ({{patientSpecies}} - {{patientBreed}}) en <strong>Bobby VetCare</strong>.
+                            </p>
+
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:18px;margin-bottom:20px;">
+                                <tr>
+                                    <td style="padding:6px 0;font-size:14px;color:#1e40af;"><strong>Folio de seguimiento:</strong></td>
+                                    <td style="padding:6px 0;font-size:14px;color:#111827;text-align:right;"><strong>{{folio}}</strong></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:6px 0;font-size:14px;color:#1e40af;"><strong>Fecha:</strong></td>
+                                    <td style="padding:6px 0;font-size:14px;color:#111827;text-align:right;">{{scheduledDate}}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:6px 0;font-size:14px;color:#1e40af;"><strong>Horario:</strong></td>
+                                    <td style="padding:6px 0;font-size:14px;color:#111827;text-align:right;">{{startTime}} - {{endTime}} hrs</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:6px 0;font-size:14px;color:#1e40af;"><strong>Especialidad:</strong></td>
+                                    <td style="padding:6px 0;font-size:14px;color:#111827;text-align:right;">{{specialty}}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:6px 0;font-size:14px;color:#1e40af;"><strong>Veterinario asignado:</strong></td>
+                                    <td style="padding:6px 0;font-size:14px;color:#111827;text-align:right;">{{veterinarianFullName}}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:6px 0;font-size:14px;color:#1e40af;"><strong>Notas:</strong></td>
+                                    <td style="padding:6px 0;font-size:14px;color:#111827;text-align:right;">{{notes}}</td>
+                                </tr>
+                            </table>
+
+                            <p style="margin:0 0 12px;font-size:14px;line-height:1.5;color:#4b5563;">
+                                Por favor llega 10 minutos antes de tu cita y trae la cartilla de vacunación de <strong>{{patientName}}</strong> si aplica.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="background-color:#f9fafb;padding:16px 32px;border-top:1px solid #e5e7eb;font-size:12px;color:#6b7280;text-align:center;">
+                            Este es un recordatorio automático enviado por Bobby VetCare. Por favor no respondas directamente a este correo.
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
