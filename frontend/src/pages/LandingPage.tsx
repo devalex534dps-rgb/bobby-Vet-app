@@ -352,7 +352,7 @@ export const LandingPage: React.FC = () => {
 
           <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 pt-1">
             <span>Folios de ejemplo:</span>
-            {["BOB-2026-001", "BOB-2026-002", "BOB-2026-003"].map((sample) => (
+            {["BVC-2026-0001", "BVC-2026-0002", "BVC-2026-0003"].map((sample) => (
               <button
                 key={sample}
                 type="button"

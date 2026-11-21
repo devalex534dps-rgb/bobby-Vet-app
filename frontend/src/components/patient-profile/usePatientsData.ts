@@ -98,6 +98,7 @@ export const usePatientsData = (params?: PatientsQueryParams) => {
         clinicalStatus: data.estado || data.status || "Al día",
         ownerName: data.propietario || data.ownerName || "Propietario",
         ownerPhone: data.ownerContact || "+52 55 0000 0000",
+        photoUrl: data.imagen || data.photoUrl,
       });
       await queryClient.invalidateQueries({ queryKey: ["patients"] });
       return mapDtoToPatient(created);
@@ -114,6 +115,8 @@ export const usePatientsData = (params?: PatientsQueryParams) => {
         gender: updates.gender,
         ageLabel: updates.edad || updates.age,
         clinicalStatus: updates.estado || updates.status,
+        photoUrl: updates.imagen || updates.photoUrl,
+        ownerName: updates.propietario || updates.ownerName,
       });
       await queryClient.invalidateQueries({ queryKey: ["patients"] });
       return mapDtoToPatient(updated);

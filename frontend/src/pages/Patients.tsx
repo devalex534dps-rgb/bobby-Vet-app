@@ -58,18 +58,32 @@ export const Patients: React.FC = () => {
   const handleDeletePatient = async (patient: Patient) => {
     const confirmed = await confirmDeletePatientAlert(patient.nombre || patient.name);
     if (confirmed) {
-      deletePatient(patient.id);
-      showSuccessToast("Paciente Eliminado", `${patient.nombre} ha sido removido del directorio.`);
+      try {
+        await deletePatient(patient.id);
+        showSuccessToast("Paciente Eliminado", `${patient.nombre} ha sido removido del directorio.`);
+      } catch (err) {
+        showSuccessToast(
+          "Error al eliminar",
+          err instanceof Error ? err.message : "No se pudo eliminar el paciente."
+        );
+      }
     }
   };
 
   const handleSaveModal = async (data: any) => {
-    if (modalMode === "create") {
-      const created = await createPatient(data);
-      showSuccessToast("Paciente Creado", `${created.nombre} ha sido agregado exitosamente.`);
-    } else if (selectedPatient) {
-      await updatePatient(selectedPatient.id, data);
-      showSuccessToast("Paciente Actualizado", `Los datos de ${data.nombre} han sido guardados.`);
+    try {
+      if (modalMode === "create") {
+        const created = await createPatient(data);
+        showSuccessToast("Paciente Creado", `${created.nombre} ha sido agregado exitosamente.`);
+      } else if (selectedPatient) {
+        await updatePatient(selectedPatient.id, data);
+        showSuccessToast("Paciente Actualizado", `Los datos de ${data.nombre} han sido guardados.`);
+      }
+    } catch (err) {
+      showSuccessToast(
+        "Error al guardar",
+        err instanceof Error ? err.message : "No se pudieron guardar los cambios."
+      );
     }
   };
 

@@ -26,14 +26,51 @@ import {
   type BackendConsultationDto,
 } from "@/services/bobbyApi";
 
+import { useQuery } from "@tanstack/react-query";
+import type { Patient, PatientSpecies, PatientStatus } from "@/components/patients/types";
+import { getStatusVariant } from "@/components/patient-profile/usePatientsData";
+
 export const PatientProfile: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<ProfileTabId>("resumen");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  const { getPatientById, updatePatient, deletePatient, isLoading } = usePatientsData();
-  const patient = id ? getPatientById(id) : undefined;
+  const { getPatientById, updatePatient, deletePatient, isLoading: isListLoading } = usePatientsData();
+  const cachedPatient = id ? getPatientById(id) : undefined;
+
+  const detailQuery = useQuery({
+    queryKey: ["patient", id],
+    queryFn: () => bobbyApi.getPatientById(id!),
+    enabled: Boolean(id && !cachedPatient),
+    staleTime: 1000 * 30,
+  });
+
+  const patient: Patient | undefined = cachedPatient ?? (detailQuery.data ? {
+    id: detailQuery.data.id,
+    nombre: detailQuery.data.name,
+    especie: (detailQuery.data.species || "Canino") as PatientSpecies,
+    raza: detailQuery.data.breed,
+    propietario: detailQuery.data.ownerName,
+    edad: detailQuery.data.ageLabel || "1 año",
+    estado: (detailQuery.data.clinicalStatus || "Al día") as PatientStatus,
+    imagen: detailQuery.data.photoUrl || "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=300&q=80",
+    name: detailQuery.data.name,
+    species: (detailQuery.data.species || "Canino") as PatientSpecies,
+    breed: detailQuery.data.breed,
+    ownerName: detailQuery.data.ownerName,
+    age: detailQuery.data.ageLabel || "1 año",
+    gender: detailQuery.data.gender || "Macho",
+    status: (detailQuery.data.clinicalStatus || "Al día") as PatientStatus,
+    statusVariant: getStatusVariant(detailQuery.data.clinicalStatus || "Al día"),
+    photoUrl: detailQuery.data.photoUrl || "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=300&q=80",
+    chipId: `VET-${detailQuery.data.id.slice(0, 6).toUpperCase()}`,
+    ownerContact: detailQuery.data.ownerContact,
+    lastVisit: "Reciente",
+    lastVisitType: "Control clínico",
+  } : undefined);
+
+  const isLoading = isListLoading || detailQuery.isLoading;
 
   const [consultations, setConsultations] = useState<BackendConsultationDto[]>([]);
   const [nextAppointment, setNextAppointment] = useState<BackendAppointmentDto | null>(null);
