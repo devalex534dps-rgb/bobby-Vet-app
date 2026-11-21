@@ -1,9 +1,11 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { HeroSection } from "@/components/login/HeroSection";
 import { LoginForm } from "@/components/login/LoginForm";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const Login: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [logoLoaded, setLogoLoaded] = useState(false);
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -14,7 +16,7 @@ export const Login: React.FC = () => {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let animationFrameId: number;
+    let animationFrameId: number | null = null;
     let width = window.innerWidth;
     let height = window.innerHeight;
 
@@ -70,6 +72,7 @@ export const Login: React.FC = () => {
       if (points.length > MAX_POINTS) {
         points.shift();
       }
+      scheduleRender();
     };
 
     const handlePointerLeave = () => {
@@ -79,7 +82,14 @@ export const Login: React.FC = () => {
     window.addEventListener("pointermove", handlePointerMove, { passive: true });
     window.addEventListener("pointerleave", handlePointerLeave);
 
+    const scheduleRender = () => {
+      if (animationFrameId === null) {
+        animationFrameId = requestAnimationFrame(render);
+      }
+    };
+
     const render = () => {
+      animationFrameId = null;
       ctx.clearRect(0, 0, width, height);
 
       if (points.length > 1) {
@@ -164,13 +174,15 @@ export const Login: React.FC = () => {
         ctx.fill();
       }
 
-      animationFrameId = requestAnimationFrame(render);
+      if (points.length > 0 || mousePos.active) {
+        scheduleRender();
+      }
     };
 
-    animationFrameId = requestAnimationFrame(render);
-
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+      }
       window.removeEventListener("resize", resize);
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("pointerleave", handlePointerLeave);
@@ -203,10 +215,17 @@ export const Login: React.FC = () => {
       {/* Header Superior Minimalista */}
       <header className="relative z-20 w-full px-6 lg:px-12 py-5 flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <div className="h-10 w-10 rounded-xl bg-white/90 p-1.5 shadow-xs border border-white/80 flex items-center justify-center">
+          <div className="relative h-10 w-10 rounded-xl bg-white/90 p-1.5 shadow-xs border border-white/80 flex items-center justify-center overflow-hidden">
+            {!logoLoaded && <Skeleton className="absolute inset-1 rounded-lg" />}
             <img
               alt="Bobby VetCare"
-              className="h-full w-full object-contain"
+              decoding="async"
+              fetchPriority="high"
+              onLoad={() => setLogoLoaded(true)}
+              onError={() => setLogoLoaded(true)}
+              className={`h-full w-full object-contain transition-opacity duration-300 ${
+                logoLoaded ? "opacity-100" : "opacity-0"
+              }`}
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2vXquCCSvBHuQiE1DkmQpj4MCuqRRBvn692PCyyGycdDsPBkvgCSu8Hb2fZDTy8zBOSaP8C535f4V6Vy2ljByv0Fp-55E7yvfAZOVVAw3IbjIEkvOElENyy7cIvqlpQihg7xSWo3J2KSBoZngCo_qxi-TX1OIx3O_Xx6D6p32pq0nSNRtD8aCxXEpuEiotYISwaStWAR6ey-p2M6Mo4M5s8_KP5HObBi_JZ22a-CSUqlzAw2eXQjPvYb0xioLIn7EeA"
             />
           </div>

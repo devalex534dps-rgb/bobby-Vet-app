@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const HeroSection: React.FC = () => {
   const [spotlightPos, setSpotlightPos] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
+  const [emblemLoaded, setEmblemLoaded] = useState(false);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -67,9 +69,18 @@ export const HeroSection: React.FC = () => {
           <div className="relative z-10 flex flex-col items-center">
             <div className="relative p-8 sm:p-10 rounded-3xl bg-white/90 backdrop-blur-2xl border border-white shadow-2xl shadow-[#2c5ead]/15 flex items-center justify-center transform transition duration-500 hover:scale-[1.02]">
               <div className="absolute -inset-1 rounded-3xl bg-gradient-to-tr from-[#2c5ead]/15 to-[#4bb8fa]/20 blur-md pointer-events-none" />
+              {!emblemLoaded && (
+                <Skeleton className="relative z-10 w-48 sm:w-56 h-36 sm:h-40 rounded-2xl" />
+              )}
               <img
                 alt="Bobby Clínica y Estética Veterinaria"
-                className="relative z-10 w-48 sm:w-56 h-auto object-contain drop-shadow-md"
+                decoding="async"
+                fetchPriority="high"
+                onLoad={() => setEmblemLoaded(true)}
+                onError={() => setEmblemLoaded(true)}
+                className={`relative z-10 w-48 sm:w-56 h-auto object-contain drop-shadow-md transition-opacity duration-300 ${
+                  emblemLoaded ? "opacity-100" : "opacity-0 absolute"
+                }`}
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuDN9vsTiCyHkCw97uYyKH--GpAQhISDq3Y8_phJmLnll9u8pX2g98X0HcbwQv6Uq8_KGIrZoJ4N6DR07slths11nBATcBBnoi2txz7r5YznzLNhRRLAmirYJwmnAVVYneiSK7DIj2Y5nhV1RYWlO7CQ7B1tHu8_qEgDZKoQIASt6RuWBXczyAIhKclAJwqJSaxiv9KA72qR3ovQ-WPRSEzEC10wkfoNgH6d2jMcJkRILfFycs_cB4l1Hu9HUWLO0CaFKQ"
               />
             </div>
