@@ -226,6 +226,7 @@ export const bobbyApi = {
       clinicalStatus?: string;
       photoUrl?: string;
       ownerName?: string;
+      ownerPhone?: string;
     }
   ) =>
     apiRequest<BackendPatientDto>(`/patients/${id}`, {

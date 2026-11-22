@@ -66,6 +66,24 @@ public class WhatsAppService {
     }
 
     @Async("whatsAppTaskExecutor")
+    public void sendAppointmentReminder24h(AppointmentResponse appointment, String tutorPhone) {
+        if (!canSendMessage(appointment, tutorPhone, EVENT_REMINDER + "_24H")) {
+            return;
+        }
+        String body = buildReminder24hMessage(appointment);
+        dispatchWhatsAppMessage(appointment, tutorPhone, EVENT_REMINDER + "_24H", body);
+    }
+
+    @Async("whatsAppTaskExecutor")
+    public void sendAppointmentReminder2h(AppointmentResponse appointment, String tutorPhone) {
+        if (!canSendMessage(appointment, tutorPhone, EVENT_REMINDER + "_2H")) {
+            return;
+        }
+        String body = buildReminder2hMessage(appointment);
+        dispatchWhatsAppMessage(appointment, tutorPhone, EVENT_REMINDER + "_2H", body);
+    }
+
+    @Async("whatsAppTaskExecutor")
     public void sendAppointmentCancellation(AppointmentResponse appointment, String tutorPhone) {
         if (!canSendMessage(appointment, tutorPhone, EVENT_CANCELLED)) {
             return;
@@ -232,6 +250,61 @@ public class WhatsAppService {
         ).trim();
     }
 
+    private String buildReminder24hMessage(AppointmentResponse appointment) {
+        return """
+            *Bobby VetCare - Recordatorio de Cita (Mañana / 24 Horas)*
+
+            Hola *%s*, te recordamos que tienes una cita médica programada para *mañana* para tu mascota.
+
+            • *Folio:* %s
+            • *Paciente:* %s (%s - %s)
+            • *Fecha:* %s
+            • *Horario:* %s - %s hrs
+            • *Especialidad:* %s
+            • *Veterinario:* %s
+
+            Por favor acude 10 minutos antes con su cartilla de vacunación. Si necesitas reprogramar, infórmanos con anticipación.
+            """.formatted(
+            safeText(appointment.tutorName()),
+            safeText(appointment.folio()),
+            safeText(appointment.pacienteName()),
+            appointment.species() != null ? appointment.species().name() : "",
+            safeText(appointment.breed()),
+            formatDate(appointment),
+            formatStartTime(appointment),
+            formatEndTime(appointment),
+            formatSpecialty(appointment.specialty()),
+            safeText(appointment.veterinarioName())
+        ).trim();
+    }
+
+    private String buildReminder2hMessage(AppointmentResponse appointment) {
+        return """
+            *Bobby VetCare - Recordatorio de Próxima Cita (En 2 Horas)*
+
+            Hola *%s*, te recordamos que la cita médica de tu mascota es *hoy en 2 horas* a las *%s hrs*.
+
+            • *Folio:* %s
+            • *Paciente:* %s (%s - %s)
+            • *Horario:* %s - %s hrs
+            • *Especialidad:* %s
+            • *Veterinario:* %s
+
+            ¡Te esperamos en clínica 10 minutos antes del horario indicado!
+            """.formatted(
+            safeText(appointment.tutorName()),
+            formatStartTime(appointment),
+            safeText(appointment.folio()),
+            safeText(appointment.pacienteName()),
+            appointment.species() != null ? appointment.species().name() : "",
+            safeText(appointment.breed()),
+            formatStartTime(appointment),
+            formatEndTime(appointment),
+            formatSpecialty(appointment.specialty()),
+            safeText(appointment.veterinarioName())
+        ).trim();
+    }
+
     private String buildCancellationMessage(AppointmentResponse appointment) {
         return """
             *Bobby VetCare - Aviso de Cancelación de Cita*
@@ -294,14 +367,19 @@ public class WhatsAppService {
             trimmed = trimmed.substring("whatsapp:".length()).trim();
         }
         String digitsAndPlus = trimmed.replaceAll("[^0-9+]", "");
-        if (!digitsAndPlus.startsWith("+")) {
-            if (digitsAndPlus.length() == 10) {
-                digitsAndPlus = "+52" + digitsAndPlus;
-            } else {
-                digitsAndPlus = "+" + digitsAndPlus;
-            }
+        if (digitsAndPlus.startsWith("+")) {
+            return "whatsapp:" + digitsAndPlus;
         }
-        return "whatsapp:" + digitsAndPlus;
+        if (digitsAndPlus.startsWith("521") && digitsAndPlus.length() == 13) {
+            return "whatsapp:+" + digitsAndPlus;
+        }
+        if (digitsAndPlus.startsWith("52") && digitsAndPlus.length() == 12) {
+            return "whatsapp:+" + digitsAndPlus;
+        }
+        if (digitsAndPlus.length() == 10) {
+            return "whatsapp:+52" + digitsAndPlus;
+        }
+        return "whatsapp:+" + digitsAndPlus;
     }
 
     private String formatDate(AppointmentResponse appointment) {

@@ -5,10 +5,12 @@ import com.bobbyvetcare.api.dto.request.UserUpdateRequest;
 import com.bobbyvetcare.api.dto.response.PageResponse;
 import com.bobbyvetcare.api.dto.response.UserResponse;
 import com.bobbyvetcare.api.entity.RoleEntity;
+import com.bobbyvetcare.api.entity.TutorEntity;
 import com.bobbyvetcare.api.entity.UserEntity;
 import com.bobbyvetcare.api.exception.BusinessConflictException;
 import com.bobbyvetcare.api.exception.ResourceNotFoundException;
 import com.bobbyvetcare.api.repository.RoleRepository;
+import com.bobbyvetcare.api.repository.TutorRepository;
 import com.bobbyvetcare.api.repository.UserRepository;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -24,11 +26,17 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final TutorRepository tutorRepository;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public UserService(UserRepository userRepository, RoleRepository roleRepository) {
+    public UserService(
+        UserRepository userRepository,
+        RoleRepository roleRepository,
+        TutorRepository tutorRepository
+    ) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.tutorRepository = tutorRepository;
     }
 
     public PageResponse<UserResponse> getUsers(String q, String role, int page, int size) {
@@ -73,7 +81,22 @@ public class UserService {
         user.setPhone(request.phone() != null ? request.phone().trim() : null);
         user.setActive(true);
 
-        return toResponse(userRepository.save(user));
+        UserEntity saved = userRepository.save(user);
+
+        if ("CLIENTE".equalsIgnoreCase(role.getName())) {
+            TutorEntity tutor = tutorRepository.findByUsuario_IdAndDeletedAtIsNull(saved.getId())
+                .orElseGet(() -> {
+                    TutorEntity t = new TutorEntity();
+                    t.setUsuario(saved);
+                    return t;
+                });
+            tutor.setFullName(saved.getFullName());
+            tutor.setEmail(saved.getEmail());
+            tutor.setPhone(saved.getPhone() != null && !saved.getPhone().isBlank() ? saved.getPhone().trim() : "5500000000");
+            tutorRepository.save(tutor);
+        }
+
+        return toResponse(saved);
     }
 
     @Transactional
@@ -90,7 +113,20 @@ public class UserService {
             user.setActive(request.active());
         }
 
-        return toResponse(userRepository.save(user));
+        UserEntity saved = userRepository.save(user);
+
+        if ("CLIENTE".equalsIgnoreCase(role.getName())) {
+            tutorRepository.findByUsuario_IdAndDeletedAtIsNull(saved.getId())
+                .ifPresent(tutor -> {
+                    tutor.setFullName(saved.getFullName());
+                    if (saved.getPhone() != null && !saved.getPhone().isBlank()) {
+                        tutor.setPhone(saved.getPhone().trim());
+                    }
+                    tutorRepository.save(tutor);
+                });
+        }
+
+        return toResponse(saved);
     }
 
     @Transactional

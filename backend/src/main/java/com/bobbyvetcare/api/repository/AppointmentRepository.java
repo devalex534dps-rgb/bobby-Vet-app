@@ -44,6 +44,18 @@ public interface AppointmentRepository extends JpaRepository<AppointmentEntity, 
     @EntityGraph(attributePaths = {"paciente", "paciente.tutor", "veterinario"})
     @Query("""
         SELECT a FROM AppointmentEntity a
+        WHERE a.status = :status
+          AND a.scheduledDate IN :dates
+        ORDER BY a.scheduledDate ASC, a.startTime ASC
+        """)
+    List<AppointmentEntity> findByStatusAndScheduledDateIn(
+        @Param("status") AppointmentStatus status,
+        @Param("dates") List<LocalDate> dates
+    );
+
+    @EntityGraph(attributePaths = {"paciente", "paciente.tutor", "veterinario"})
+    @Query("""
+        SELECT a FROM AppointmentEntity a
         WHERE (:status IS NULL OR a.status = :status)
           AND (:scheduledDate IS NULL OR a.scheduledDate = :scheduledDate)
           AND (:q IS NULL OR LOWER(a.paciente.name) LIKE LOWER(CONCAT('%', :q, '%'))

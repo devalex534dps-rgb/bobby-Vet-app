@@ -10,6 +10,8 @@ interface PatientEditModalProps {
   onSave: (data: {
     nombre: string;
     propietario: string;
+    telefono?: string;
+    ownerContact?: string;
     especie: PatientSpecies;
     raza: string;
     edad: string;
@@ -37,6 +39,7 @@ export const PatientEditModal: React.FC<PatientEditModalProps> = ({
 }) => {
   const [nombre, setNombre] = useState("");
   const [propietario, setPropietario] = useState("");
+  const [telefono, setTelefono] = useState("");
   const [especie, setEspecie] = useState<PatientSpecies>("Canino");
   const [raza, setRaza] = useState("");
   const [edad, setEdad] = useState("");
@@ -48,6 +51,7 @@ export const PatientEditModal: React.FC<PatientEditModalProps> = ({
     if (patient && mode === "edit") {
       setNombre(patient.nombre || patient.name || "");
       setPropietario(patient.propietario || patient.ownerName || "");
+      setTelefono(patient.ownerContact || "");
       setEspecie((patient.especie || patient.species || "Canino") as PatientSpecies);
       setRaza(patient.raza || patient.breed || "");
       setEdad(patient.edad || patient.age || "");
@@ -56,6 +60,7 @@ export const PatientEditModal: React.FC<PatientEditModalProps> = ({
     } else {
       setNombre("");
       setPropietario("");
+      setTelefono("");
       setEspecie("Canino");
       setRaza("");
       setEdad("1 año");
@@ -73,6 +78,7 @@ export const PatientEditModal: React.FC<PatientEditModalProps> = ({
 
     if (!nombre.trim()) newErrors.nombre = "El nombre es obligatorio";
     if (!propietario.trim()) newErrors.propietario = "El propietario es obligatorio";
+    if (!telefono.trim()) newErrors.telefono = "El teléfono del tutor es requerido para WhatsApp";
     if (!raza.trim()) newErrors.raza = "La raza es obligatoria";
     if (!edad.trim()) newErrors.edad = "La edad es obligatoria";
 
@@ -84,6 +90,8 @@ export const PatientEditModal: React.FC<PatientEditModalProps> = ({
     onSave({
       nombre: nombre.trim(),
       propietario: propietario.trim(),
+      telefono: telefono.trim(),
+      ownerContact: telefono.trim(),
       especie,
       raza: raza.trim(),
       edad: edad.trim(),
@@ -206,7 +214,7 @@ export const PatientEditModal: React.FC<PatientEditModalProps> = ({
             </div>
           </div>
 
-          {/* Propietario & Edad */}
+          {/* Propietario & Teléfono */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-on-surface mb-1">
@@ -230,6 +238,29 @@ export const PatientEditModal: React.FC<PatientEditModalProps> = ({
 
             <div>
               <label className="block text-xs font-semibold text-on-surface mb-1">
+                Teléfono del Tutor (WhatsApp) <span className="text-error">*</span>
+              </label>
+              <div className="relative">
+                <input
+                  type="tel"
+                  value={telefono}
+                  onChange={(e) => setTelefono(e.target.value)}
+                  placeholder="Ej. 5512345678 o +5255..."
+                  className={`w-full px-3 py-2 text-sm rounded-xl bg-surface-container-lowest border ${
+                    errors.telefono ? "border-error focus:ring-error" : "border-slate-200/80 focus:border-primary"
+                  } text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none focus:ring-1 focus:ring-primary`}
+                />
+              </div>
+              {errors.telefono && (
+                <span className="text-[11px] text-error mt-0.5 block">{errors.telefono}</span>
+              )}
+            </div>
+          </div>
+
+          {/* Edad & Estado Clínico */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-on-surface mb-1">
                 Edad <span className="text-error">*</span>
               </label>
               <div className="relative">
@@ -247,18 +278,17 @@ export const PatientEditModal: React.FC<PatientEditModalProps> = ({
                 <span className="text-[11px] text-error mt-0.5 block">{errors.edad}</span>
               )}
             </div>
-          </div>
 
-          {/* Estado Clínico */}
-          <div>
-            <label className="block text-xs font-semibold text-on-surface mb-1">
-              Estado Clínico
-            </label>
-            <StyledSelect
-              value={estado}
-              onChange={(val) => setEstado(val as PatientStatus)}
-              options={AVAILABLE_STATUSES.map((st) => ({ value: st, label: st }))}
-            />
+            <div>
+              <label className="block text-xs font-semibold text-on-surface mb-1">
+                Estado Clínico
+              </label>
+              <StyledSelect
+                value={estado}
+                onChange={(val) => setEstado(val as PatientStatus)}
+                options={AVAILABLE_STATUSES.map((st) => ({ value: st, label: st }))}
+              />
+            </div>
           </div>
 
           {/* Optional Imagen URL */}

@@ -8,6 +8,7 @@ import com.bobbyvetcare.api.entity.enums.AppointmentStatus;
 import com.bobbyvetcare.api.service.AppointmentService;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
+import java.util.Map;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -72,6 +73,18 @@ public class AppointmentController {
     @PostMapping("/{id}/reminder")
     public ResponseEntity<AppointmentResponse> sendAppointmentReminder(@PathVariable String id) {
         return ResponseEntity.ok(appointmentService.sendAppointmentReminder(id));
+    }
+
+    @PostMapping("/reminders/trigger-24h")
+    public ResponseEntity<Map<String, Object>> trigger24hReminders() {
+        int count = appointmentService.process24HourReminders();
+        return ResponseEntity.ok(Map.of("status", "ok", "dispatched", count, "type", "24_HOURS"));
+    }
+
+    @PostMapping("/reminders/trigger-2h")
+    public ResponseEntity<Map<String, Object>> trigger2hReminders() {
+        int count = appointmentService.process2HourReminders();
+        return ResponseEntity.ok(Map.of("status", "ok", "dispatched", count, "type", "2_HOURS"));
     }
 
     @DeleteMapping("/{id}")

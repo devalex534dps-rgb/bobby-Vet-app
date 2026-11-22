@@ -66,6 +66,37 @@ public class SmsService {
     }
 
     @Async("smsTaskExecutor")
+    public void sendAppointmentReminder24h(AppointmentResponse appointment, String tutorPhone) {
+        if (!canSendMessage(appointment, tutorPhone, EVENT_REMINDER + "_24H")) {
+            return;
+        }
+        String body = "Bobby VetCare - Recordatorio 24h [%s]. Hola %s, te recordamos que manana es la cita de %s a las %s hrs. Vet: %s."
+            .formatted(
+                safeText(appointment.folio()),
+                safeText(appointment.tutorName()),
+                safeText(appointment.pacienteName()),
+                formatStartTime(appointment),
+                safeText(appointment.veterinarioName())
+            );
+        dispatchSmsMessage(appointment, tutorPhone, EVENT_REMINDER + "_24H", body);
+    }
+
+    @Async("smsTaskExecutor")
+    public void sendAppointmentReminder2h(AppointmentResponse appointment, String tutorPhone) {
+        if (!canSendMessage(appointment, tutorPhone, EVENT_REMINDER + "_2H")) {
+            return;
+        }
+        String body = "Bobby VetCare - Recordatorio 2h [%s]. Hola %s, la cita de %s es hoy en 2 horas (%s hrs). Te esperamos 10 min antes."
+            .formatted(
+                safeText(appointment.folio()),
+                safeText(appointment.tutorName()),
+                safeText(appointment.pacienteName()),
+                formatStartTime(appointment)
+            );
+        dispatchSmsMessage(appointment, tutorPhone, EVENT_REMINDER + "_2H", body);
+    }
+
+    @Async("smsTaskExecutor")
     public void sendAppointmentCancellation(AppointmentResponse appointment, String tutorPhone) {
         if (!canSendMessage(appointment, tutorPhone, EVENT_CANCELLED)) {
             return;
@@ -241,14 +272,19 @@ public class SmsService {
             trimmed = trimmed.substring("whatsapp:".length()).trim();
         }
         String digitsAndPlus = trimmed.replaceAll("[^0-9+]", "");
-        if (!digitsAndPlus.startsWith("+")) {
-            if (digitsAndPlus.length() == 10) {
-                digitsAndPlus = "+52" + digitsAndPlus;
-            } else {
-                digitsAndPlus = "+" + digitsAndPlus;
-            }
+        if (digitsAndPlus.startsWith("+")) {
+            return digitsAndPlus;
         }
-        return digitsAndPlus;
+        if (digitsAndPlus.startsWith("521") && digitsAndPlus.length() == 13) {
+            return "+" + digitsAndPlus;
+        }
+        if (digitsAndPlus.startsWith("52") && digitsAndPlus.length() == 12) {
+            return "+" + digitsAndPlus;
+        }
+        if (digitsAndPlus.length() == 10) {
+            return "+52" + digitsAndPlus;
+        }
+        return "+" + digitsAndPlus;
     }
 
     private String formatDate(AppointmentResponse appointment) {

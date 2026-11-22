@@ -96,6 +96,9 @@ public class PatientService {
         if (request.ownerName() != null && !request.ownerName().isBlank() && patient.getTutor() != null) {
             patient.getTutor().setFullName(request.ownerName().trim());
         }
+        if (request.ownerPhone() != null && !request.ownerPhone().isBlank() && patient.getTutor() != null) {
+            patient.getTutor().setPhone(request.ownerPhone().trim());
+        }
 
         return toResponse(patientRepository.save(patient));
     }

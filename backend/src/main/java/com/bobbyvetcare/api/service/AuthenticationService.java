@@ -10,6 +10,7 @@ import com.bobbyvetcare.api.dto.response.UserResponse;
 import com.bobbyvetcare.api.entity.PasswordResetTokenEntity;
 import com.bobbyvetcare.api.entity.RoleEntity;
 import com.bobbyvetcare.api.entity.TokenBlacklistEntity;
+import com.bobbyvetcare.api.entity.TutorEntity;
 import com.bobbyvetcare.api.entity.UserEntity;
 import com.bobbyvetcare.api.exception.BadRequestException;
 import com.bobbyvetcare.api.exception.BusinessConflictException;
@@ -17,6 +18,7 @@ import com.bobbyvetcare.api.exception.ResourceNotFoundException;
 import com.bobbyvetcare.api.repository.PasswordResetTokenRepository;
 import com.bobbyvetcare.api.repository.RoleRepository;
 import com.bobbyvetcare.api.repository.TokenBlacklistRepository;
+import com.bobbyvetcare.api.repository.TutorRepository;
 import com.bobbyvetcare.api.repository.UserRepository;
 import com.bobbyvetcare.api.security.CustomUserDetailsService;
 import com.bobbyvetcare.api.security.JwtService;
@@ -43,6 +45,7 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final TutorRepository tutorRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final TokenBlacklistRepository tokenBlacklistRepository;
     private final PasswordEncoder passwordEncoder;
@@ -54,6 +57,7 @@ public class AuthenticationService {
         AuthenticationManager authenticationManager,
         UserRepository userRepository,
         RoleRepository roleRepository,
+        TutorRepository tutorRepository,
         PasswordResetTokenRepository passwordResetTokenRepository,
         TokenBlacklistRepository tokenBlacklistRepository,
         PasswordEncoder passwordEncoder,
@@ -64,6 +68,7 @@ public class AuthenticationService {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.tutorRepository = tutorRepository;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
         this.tokenBlacklistRepository = tokenBlacklistRepository;
         this.passwordEncoder = passwordEncoder;
@@ -110,6 +115,20 @@ public class AuthenticationService {
         user.setActive(true);
 
         UserEntity saved = userRepository.save(user);
+
+        if ("CLIENTE".equalsIgnoreCase(saved.getRole().getName())) {
+            TutorEntity tutor = tutorRepository.findByUsuario_IdAndDeletedAtIsNull(saved.getId())
+                .orElseGet(() -> {
+                    TutorEntity t = new TutorEntity();
+                    t.setUsuario(saved);
+                    return t;
+                });
+            tutor.setFullName(saved.getFullName());
+            tutor.setEmail(saved.getEmail());
+            tutor.setPhone(saved.getPhone() != null && !saved.getPhone().isBlank() ? saved.getPhone().trim() : "5500000000");
+            tutorRepository.save(tutor);
+        }
+
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
         String token = jwtService.generateToken(
             userDetails,

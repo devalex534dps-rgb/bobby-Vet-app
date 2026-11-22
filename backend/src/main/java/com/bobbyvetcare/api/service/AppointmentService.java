@@ -16,10 +16,14 @@ import com.bobbyvetcare.api.repository.AppointmentRepository;
 import com.bobbyvetcare.api.repository.ConsultationRepository;
 import com.bobbyvetcare.api.repository.PatientRepository;
 import com.bobbyvetcare.api.repository.UserRepository;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -41,6 +45,9 @@ public class AppointmentService {
     private final EmailService emailService;
     private final WhatsAppService whatsAppService;
     private final SmsService smsService;
+
+    private final Set<String> sent24HourReminders = ConcurrentHashMap.newKeySet();
+    private final Set<String> sent2HourReminders = ConcurrentHashMap.newKeySet();
 
     public AppointmentService(
         AppointmentRepository appointmentRepository,
@@ -206,6 +213,98 @@ public class AppointmentService {
         whatsAppService.sendAppointmentReminder(response, tutorPhone);
         smsService.sendAppointmentReminder(response, tutorPhone);
         return response;
+    }
+
+    @Scheduled(cron = "${app.automation.reminder-cron:0 */10 * * * *}")
+    public void triggerAutomatedReminders() {
+        process24HourReminders();
+        process2HourReminders();
+    }
+
+    @Transactional(readOnly = true)
+    public int process24HourReminders() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDate today = now.toLocalDate();
+        LocalDate tomorrow = today.plusDays(1);
+        LocalDate dayAfterTomorrow = today.plusDays(2);
+
+        List<AppointmentEntity> candidateAppointments = appointmentRepository
+            .findByStatusAndScheduledDateIn(
+                AppointmentStatus.confirmed,
+                List.of(today, tomorrow, dayAfterTomorrow)
+            );
+
+        int sentCount = 0;
+        for (AppointmentEntity appointment : candidateAppointments) {
+            if (appointment.getScheduledDate() == null || appointment.getStartTime() == null) {
+                continue;
+            }
+            LocalDateTime appointmentTime = LocalDateTime.of(appointment.getScheduledDate(), appointment.getStartTime());
+            long minutesUntil = Duration.between(now, appointmentTime).toMinutes();
+
+            // Ventana 24 horas antes: entre 23 horas (1380m) y 25 horas (1500m)
+            if (minutesUntil >= 1380 && minutesUntil <= 1500) {
+                if (sent24HourReminders.add(appointment.getId())) {
+                    AppointmentResponse response = toResponse(appointment);
+                    String tutorPhone = extractTutorPhone(appointment);
+                    log.info(
+                        "[AUTOMATION_24H_WHATSAPP] Disparando recordatorio 24h citaId={}, folio={}, tutor={}, phone={}, fechaHora={}",
+                        appointment.getId(),
+                        appointment.getFolio(),
+                        response.tutorName(),
+                        tutorPhone,
+                        appointmentTime
+                    );
+                    whatsAppService.sendAppointmentReminder24h(response, tutorPhone);
+                    smsService.sendAppointmentReminder24h(response, tutorPhone);
+                    emailService.sendAppointmentReminder(AppointmentEmailDto.fromEntity(appointment));
+                    sentCount++;
+                }
+            }
+        }
+        return sentCount;
+    }
+
+    @Transactional(readOnly = true)
+    public int process2HourReminders() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDate today = now.toLocalDate();
+        LocalDate tomorrow = today.plusDays(1);
+
+        List<AppointmentEntity> candidateAppointments = appointmentRepository
+            .findByStatusAndScheduledDateIn(
+                AppointmentStatus.confirmed,
+                List.of(today, tomorrow)
+            );
+
+        int sentCount = 0;
+        for (AppointmentEntity appointment : candidateAppointments) {
+            if (appointment.getScheduledDate() == null || appointment.getStartTime() == null) {
+                continue;
+            }
+            LocalDateTime appointmentTime = LocalDateTime.of(appointment.getScheduledDate(), appointment.getStartTime());
+            long minutesUntil = Duration.between(now, appointmentTime).toMinutes();
+
+            // Ventana 2 horas antes: entre 90m (1h 30m) y 150m (2h 30m)
+            if (minutesUntil >= 90 && minutesUntil <= 150) {
+                if (sent2HourReminders.add(appointment.getId())) {
+                    AppointmentResponse response = toResponse(appointment);
+                    String tutorPhone = extractTutorPhone(appointment);
+                    log.info(
+                        "[AUTOMATION_2H_WHATSAPP] Disparando recordatorio 2h citaId={}, folio={}, tutor={}, phone={}, fechaHora={}",
+                        appointment.getId(),
+                        appointment.getFolio(),
+                        response.tutorName(),
+                        tutorPhone,
+                        appointmentTime
+                    );
+                    whatsAppService.sendAppointmentReminder2h(response, tutorPhone);
+                    smsService.sendAppointmentReminder2h(response, tutorPhone);
+                    sentCount++;
+                }
+            }
+        }
+        return sentCount;
     }
 
     @Scheduled(cron = "${app.mail.reminder-cron:0 0 8 * * *}")
