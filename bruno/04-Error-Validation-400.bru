@@ -1,0 +1,20 @@
+meta {
+  name: 04 - Error Validacion Registro (400 Bad Request)
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/auth/register
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "fullName": "",
+    "email": "correo-invalido",
+    "password": "123",
+    "phone": ""
+  }
+}

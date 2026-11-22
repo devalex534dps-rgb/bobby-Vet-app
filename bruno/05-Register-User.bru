@@ -1,0 +1,35 @@
+meta {
+  name: 05 - Register User (Crear cuenta y obtener JWT)
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/auth/register
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "fullName": "Usuario Prueba Bruno",
+    "email": "bruno.test@bobbyvetcare.mx",
+    "password": "BrunoUser2026!",
+    "phone": "+525512345678"
+  }
+}
+
+script:post-response {
+  if (res.status === 201 && res.body?.token) {
+    bru.setEnvVar("token", res.body.token);
+  }
+}
+
+tests {
+  test("Status 201 y token Bearer", function() {
+    expect(res.status).to.equal(201);
+    expect(res.body.token).to.be.a("string");
+    expect(res.body.tokenType).to.equal("Bearer");
+    expect(res.body.user.role).to.equal("CLIENTE");
+  });
+}

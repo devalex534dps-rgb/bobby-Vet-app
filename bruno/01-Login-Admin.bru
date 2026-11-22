@@ -1,0 +1,33 @@
+meta {
+  name: 01 - Login Admin (Obtener JWT)
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "admin@bobbyvetcare.mx",
+    "password": "BobbyAdmin2026!"
+  }
+}
+
+script:post-response {
+  if (res.status === 200 && res.body?.token) {
+    bru.setEnvVar("token", res.body.token);
+  }
+}
+
+tests {
+  test("Status 200 y token Bearer", function() {
+    expect(res.status).to.equal(200);
+    expect(res.body.token).to.be.a("string");
+    expect(res.body.tokenType).to.equal("Bearer");
+    expect(res.body.user.email).to.equal("admin@bobbyvetcare.mx");
+  });
+}
