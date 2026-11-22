@@ -24,7 +24,7 @@
     "sweetalert2": "^11.26.25",
     "tailwind-merge": "^3.0.1",
     "three": "^0.187.0",
-    "zod": "^3.24.2"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.9",
