@@ -54,12 +54,8 @@ public class PatientEntity {
     @Column(name = "weight_kg", precision = 6, scale = 2)
     private BigDecimal weightKg;
 
-    @Column(
-        name = "clinical_status",
-        nullable = false,
-        columnDefinition = "ENUM('Al día', 'En tratamiento', 'En seguimiento', 'Vacuna pendiente', 'En recuperación')"
-    )
-    private String clinicalStatus = "Al día";
+    @Column(name = "clinical_status", nullable = false, columnDefinition = "ENUM('Al dia', 'En tratamiento', 'En seguimiento', 'Vacuna pendiente', 'En recuperacion')")
+    private String clinicalStatus = "Al dia";
 
     @Column(name = "photo_url", columnDefinition = "TEXT")
     private String photoUrl;
@@ -203,8 +199,10 @@ public class PatientEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof PatientEntity that)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof PatientEntity that))
+            return false;
         return id != null && Objects.equals(id, that.id);
     }
 
