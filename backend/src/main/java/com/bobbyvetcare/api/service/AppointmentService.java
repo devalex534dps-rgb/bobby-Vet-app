@@ -43,8 +43,7 @@ public class AppointmentService {
     private final UserRepository userRepository;
     private final ConsultationRepository consultationRepository;
     private final EmailService emailService;
-    private final WhatsAppService whatsAppService;
-    private final SmsService smsService;
+    private final OpenWaWhatsAppService whatsAppService;
 
     private final Set<String> sent24HourReminders = ConcurrentHashMap.newKeySet();
     private final Set<String> sent2HourReminders = ConcurrentHashMap.newKeySet();
@@ -55,8 +54,7 @@ public class AppointmentService {
         UserRepository userRepository,
         ConsultationRepository consultationRepository,
         EmailService emailService,
-        WhatsAppService whatsAppService,
-        SmsService smsService
+        OpenWaWhatsAppService whatsAppService
     ) {
         this.appointmentRepository = appointmentRepository;
         this.patientRepository = patientRepository;
@@ -64,7 +62,6 @@ public class AppointmentService {
         this.consultationRepository = consultationRepository;
         this.emailService = emailService;
         this.whatsAppService = whatsAppService;
-        this.smsService = smsService;
     }
 
     public PageResponse<AppointmentResponse> getAppointments(
@@ -128,8 +125,7 @@ public class AppointmentService {
         String tutorPhone = extractTutorPhone(saved);
 
         emailService.sendAppointmentConfirmation(AppointmentEmailDto.fromEntity(saved));
-        whatsAppService.sendAppointmentConfirmation(response, tutorPhone);
-        smsService.sendAppointmentConfirmation(response, tutorPhone);
+        whatsAppService.sendAppointmentCreated(response, tutorPhone);
         return response;
     }
 
@@ -153,14 +149,11 @@ public class AppointmentService {
             emailService.sendAppointmentConfirmation(AppointmentEmailDto.fromEntity(saved));
             if (previousStatus == AppointmentStatus.cancelled) {
                 whatsAppService.sendAppointmentRescheduled(response, tutorPhone);
-                smsService.sendAppointmentRescheduled(response, tutorPhone);
             } else {
                 whatsAppService.sendAppointmentConfirmation(response, tutorPhone);
-                smsService.sendAppointmentConfirmation(response, tutorPhone);
             }
         } else if (previousStatus != AppointmentStatus.cancelled && saved.getStatus() == AppointmentStatus.cancelled) {
             whatsAppService.sendAppointmentCancellation(response, tutorPhone);
-            smsService.sendAppointmentCancellation(response, tutorPhone);
         }
 
         return response;
@@ -192,7 +185,6 @@ public class AppointmentService {
         AppointmentResponse response = toResponse(saved);
         String tutorPhone = extractTutorPhone(saved);
         whatsAppService.sendAppointmentRescheduled(response, tutorPhone);
-        smsService.sendAppointmentRescheduled(response, tutorPhone);
         return response;
     }
 
@@ -211,7 +203,6 @@ public class AppointmentService {
         String tutorPhone = extractTutorPhone(appointment);
         emailService.sendAppointmentReminder(AppointmentEmailDto.fromEntity(appointment));
         whatsAppService.sendAppointmentReminder(response, tutorPhone);
-        smsService.sendAppointmentReminder(response, tutorPhone);
         return response;
     }
 
@@ -256,7 +247,6 @@ public class AppointmentService {
                         appointmentTime
                     );
                     whatsAppService.sendAppointmentReminder24h(response, tutorPhone);
-                    smsService.sendAppointmentReminder24h(response, tutorPhone);
                     emailService.sendAppointmentReminder(AppointmentEmailDto.fromEntity(appointment));
                     sentCount++;
                 }
@@ -299,7 +289,6 @@ public class AppointmentService {
                         appointmentTime
                     );
                     whatsAppService.sendAppointmentReminder2h(response, tutorPhone);
-                    smsService.sendAppointmentReminder2h(response, tutorPhone);
                     sentCount++;
                 }
             }
@@ -324,7 +313,6 @@ public class AppointmentService {
             String tutorPhone = extractTutorPhone(appointment);
             emailService.sendAppointmentReminder(AppointmentEmailDto.fromEntity(appointment));
             whatsAppService.sendAppointmentReminder(response, tutorPhone);
-            smsService.sendAppointmentReminder(response, tutorPhone);
         }
     }
 

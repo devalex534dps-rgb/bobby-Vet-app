@@ -34,8 +34,9 @@ app.mail.from=${MAIL_FROM:no-reply@bobbyvetcare.com}
 app.mail.from-name=${MAIL_FROM_NAME:Bobby VetCare}
 app.mail.reminder-cron=${MAIL_REMINDER_CRON:0 0 8 * * *}
 
-# Twilio WhatsApp & SMS API
-twilio.account-sid=${TWILIO_ACCOUNT_SID:}
-twilio.auth-token=${TWILIO_AUTH_TOKEN:}
-twilio.whatsapp-number=${TWILIO_WHATSAPP_NUMBER:}
-twilio.phone-number=${TWILIO_PHONE_NUMBER:}
+# OpenWA WhatsApp API (Baileys local en VPS)
+openwa.base-url=${OPENWA_BASE_URL:http://localhost:2785}
+openwa.api-key=${OPENWA_API_KEY:}
+openwa.session-id=${OPENWA_SESSION_ID:}
+openwa.connect-timeout-ms=${OPENWA_CONNECT_TIMEOUT_MS:5000}
+openwa.read-timeout-ms=${OPENWA_READ_TIMEOUT_MS:10000}

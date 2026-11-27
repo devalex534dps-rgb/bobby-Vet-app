@@ -1,5 +1,6 @@
 package com.bobbyvetcare.api.service;
 
+import com.bobbyvetcare.api.dto.notification.ConsultationNotificationDto;
 import com.bobbyvetcare.api.dto.request.ConsultationCreateRequest;
 import com.bobbyvetcare.api.dto.request.ConsultationUpdateRequest;
 import com.bobbyvetcare.api.dto.response.ConsultationResponse;
@@ -38,6 +39,7 @@ public class ConsultationService {
     private final UserRepository userRepository;
     private final ServiceRepository serviceRepository;
     private final ServiceCatalogService serviceCatalogService;
+    private final OpenWaWhatsAppService whatsAppService;
 
     public ConsultationService(
         ConsultationRepository consultationRepository,
@@ -45,7 +47,8 @@ public class ConsultationService {
         AppointmentRepository appointmentRepository,
         UserRepository userRepository,
         ServiceRepository serviceRepository,
-        ServiceCatalogService serviceCatalogService
+        ServiceCatalogService serviceCatalogService,
+        OpenWaWhatsAppService whatsAppService
     ) {
         this.consultationRepository = consultationRepository;
         this.patientRepository = patientRepository;
@@ -53,6 +56,7 @@ public class ConsultationService {
         this.userRepository = userRepository;
         this.serviceRepository = serviceRepository;
         this.serviceCatalogService = serviceCatalogService;
+        this.whatsAppService = whatsAppService;
     }
 
     public PageResponse<ConsultationResponse> getConsultations(
@@ -115,7 +119,9 @@ public class ConsultationService {
             consultation.setServicios(resolveServices(request.servicioIds()));
         }
 
-        return toResponse(consultationRepository.save(consultation));
+        ConsultationEntity saved = consultationRepository.save(consultation);
+        whatsAppService.sendConsultationCreated(ConsultationNotificationDto.fromEntity(saved));
+        return toResponse(saved);
     }
 
     @Transactional
@@ -146,7 +152,9 @@ public class ConsultationService {
             appointmentRepository.save(appointment);
         }
 
-        return toResponse(consultationRepository.save(consultation));
+        ConsultationEntity saved = consultationRepository.save(consultation);
+        whatsAppService.sendConsultationCompleted(ConsultationNotificationDto.fromEntity(saved));
+        return toResponse(saved);
     }
 
     private void applyReportFields(ConsultationEntity consultation, ConsultationUpdateRequest request) {
