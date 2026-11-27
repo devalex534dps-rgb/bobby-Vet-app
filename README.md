@@ -32,10 +32,9 @@
 - **Backend:** Java 21 / 25, Spring Boot 3, Spring Data JPA / Hibernate, Spring Security con JWT
 - **Base de Datos:** MySQL 8.0+ (InnoDB, UTF-8 mb4, restricciones FK, índices únicos)
 - **Comunicaciones y Automatización:**
-  - **Correo electrónico:** `JavaMailSender` integrado con servidor Postfix local en el VPS (sin servicios SMTP de terceros)
-  - **WhatsApp API:** Twilio WhatsApp REST API con envíos asíncronos (`@Async`) y recordatorios programados (`@Scheduled`)
-  - **SMS API:** Twilio SMS REST API integrado para confirmaciones, cancelaciones y reprogramaciones
-  - **Automatizaciones de Recordatorio:** Notificaciones automáticas disparadas **a 24 horas** y **a 2 horas** de la cita médica
+  - **Correo electrónico:** `JavaMailSender` integrado con servidor Postfix local en el VPS o relay SMTP autenticado
+  - **WhatsApp API:** OpenWA (motor Baileys) vía REST API local con envíos asíncronos (`@Async`) y recordatorios programados (`@Scheduled`)
+  - **Automatizaciones de Eventos y Recordatorio:** Notificaciones automáticas al crear citas, al iniciar/finalizar consultas médicas y recordatorios **a 24 horas** y **a 2 horas** de la cita (WhatsApp y correo)
 - **Infraestructura y Despliegue:** Hostinger VPS (Ubuntu Linux), Nginx, systemd, SSL gratuito con Let's Encrypt / Certbot, Docker
 
 ---
@@ -265,15 +264,28 @@ cd bobby-Vet-app
    spring.datasource.username=root
    spring.datasource.password=SU_CONTRASEÑA_MYSQL
    
-   # Servidor de Correo (Postfix local o MailHog para desarrollo)
-   spring.mail.host=localhost
-   spring.mail.port=1025
-   
-   # Twilio API (Opcional para desarrollo local)
-   TWILIO_ACCOUNT_SID=
-   TWILIO_AUTH_TOKEN=
-   TWILIO_WHATSAPP_NUMBER=
-   TWILIO_PHONE_NUMBER=
+   # Servidor de Correo SMTP (Postfix local en puerto 25 o relay SMTP autenticado en puerto 587)
+   spring.mail.host=${MAIL_HOST:localhost}
+   spring.mail.port=${MAIL_PORT:1025}
+   spring.mail.username=${MAIL_USERNAME:}
+   spring.mail.password=${MAIL_PASSWORD:}
+   spring.mail.properties.mail.smtp.starttls.enable=${MAIL_STARTTLS_ENABLE:false}
+   spring.mail.properties.mail.smtp.starttls.required=${MAIL_STARTTLS_REQUIRED:false}
+   spring.mail.properties.mail.smtp.connectiontimeout=5000
+   spring.mail.properties.mail.smtp.timeout=5000
+   spring.mail.properties.mail.smtp.writetimeout=5000
+
+   app.mail.from=${MAIL_FROM:no-reply@veterinariabobby.tech}
+   app.mail.from-name=${MAIL_FROM_NAME:Bobby VetCare}
+   app.mail.reminder-cron=${MAIL_REMINDER_CRON:0 0 8 * * *}
+   app.automation.reminder-cron=${REMINDER_AUTOMATION_CRON:0 */10 * * * *}
+
+   # OpenWA WhatsApp API (Baileys local en VPS - Opcional para desarrollo local)
+   openwa.base-url=${OPENWA_BASE_URL:http://localhost:2785}
+   openwa.api-key=${OPENWA_API_KEY:}
+   openwa.session-id=${OPENWA_SESSION_ID:}
+   openwa.connect-timeout-ms=${OPENWA_CONNECT_TIMEOUT_MS:5000}
+   openwa.read-timeout-ms=${OPENWA_READ_TIMEOUT_MS:10000}
    ```
 3. Compile y ejecute la aplicación Spring Boot:
    ```bash
@@ -309,16 +321,16 @@ La aplicación estará disponible en `http://localhost:5173`.
 
 ---
 
-## Automatizaciones y Mensajería (WhatsApp, SMS y Correo)
+## Automatizaciones y Mensajería (WhatsApp OpenWA y Correo)
 
-1. **Correo Electrónico (Postfix local en VPS):**
-   - Configurado en el VPS propio con Postfix, registros SPF y DKIM, consumido en Spring Boot con `JavaMailSender`.
-   - Se disparan correos automáticos asíncronos (`@Async`) al crear citas y al ejecutar recordatorios.
-2. **WhatsApp API (Twilio) & SMS:**
-   - Envío asíncrono con formato E.164 (+52 para números de México).
-   - Confirmación inmediata al agendar cita médica.
-   - Notificación de reprogramación y aviso de cancelación.
+1. **Correo Electrónico (`JavaMailSender` / Postfix o SMTP):**
+   - Configurado en el VPS con Postfix local (SPF/DKIM) o relay SMTP autenticado con STARTTLS, consumido en Spring Boot mediante `JavaMailSender`.
+   - Se disparan correos automáticos asíncronos (`@Async`) al crear citas y en los recordatorios programados (24 horas, 2 horas y resumen diario).
+2. **WhatsApp API (OpenWA con motor Baileys):**
+   - Envío asíncrono vía REST API local (`POST /api/sessions/{sessionId}/messages/send-text`) con normalización de número a `@c.us` (+52 para México).
+   - Notificaciones inmediatas al agendar cita (`APPOINTMENT_CREATED`), al iniciar consulta (`CONSULTATION_CREATED`) y al cerrar consulta (`CONSULTATION_COMPLETED`).
+   - Confirmación, reprogramación y aviso de cancelación de citas.
 3. **Automatizaciones Programadas (`@Scheduled`):**
-   - **Recordatorio a 24 horas:** El sistema evalúa citas confirmadas dentro de la ventana de 24 horas y envía el mensaje de WhatsApp y correo con los detalles de la consulta del día siguiente.
-   - **Recordatorio a 2 horas:** Recordatorio prioritario con mensaje de urgencia indicando el horario exacto y recomendación de presentarse 10 minutos antes en clínica.
+   - **Recordatorio a 24 horas:** El sistema evalúa citas confirmadas dentro de la ventana de 24 horas y envía mensaje por **WhatsApp (OpenWA)** y **correo electrónico** con los detalles de la consulta del día siguiente.
+   - **Recordatorio a 2 horas:** Recordatorio prioritario por **WhatsApp (OpenWA)** y **correo electrónico** indicando el horario exacto y recomendación de presentarse 10 minutos antes en clínica.
    - **Control de Duplicados:** Registro en memoria concurrente para evitar notificaciones duplicadas en ejecuciones periódicas del scheduler.
