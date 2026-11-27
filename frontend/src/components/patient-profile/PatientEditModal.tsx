@@ -12,6 +12,8 @@ interface PatientEditModalProps {
     propietario: string;
     telefono?: string;
     ownerContact?: string;
+    ownerEmail?: string;
+    ownerAddress?: string;
     especie: PatientSpecies;
     raza: string;
     edad: string;
@@ -21,6 +23,8 @@ interface PatientEditModalProps {
   patient?: Patient | null;
   mode?: "edit" | "create";
 }
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const AVAILABLE_STATUSES: PatientStatus[] = [
   "Al día",
@@ -40,6 +44,8 @@ export const PatientEditModal: React.FC<PatientEditModalProps> = ({
   const [nombre, setNombre] = useState("");
   const [propietario, setPropietario] = useState("");
   const [telefono, setTelefono] = useState("");
+  const [ownerEmail, setOwnerEmail] = useState("");
+  const [ownerAddress, setOwnerAddress] = useState("");
   const [especie, setEspecie] = useState<PatientSpecies>("Canino");
   const [raza, setRaza] = useState("");
   const [edad, setEdad] = useState("");
@@ -52,6 +58,8 @@ export const PatientEditModal: React.FC<PatientEditModalProps> = ({
       setNombre(patient.nombre || patient.name || "");
       setPropietario(patient.propietario || patient.ownerName || "");
       setTelefono(patient.ownerContact || "");
+      setOwnerEmail(patient.ownerEmail || "");
+      setOwnerAddress(patient.ownerAddress || "");
       setEspecie((patient.especie || patient.species || "Canino") as PatientSpecies);
       setRaza(patient.raza || patient.breed || "");
       setEdad(patient.edad || patient.age || "");
@@ -61,6 +69,8 @@ export const PatientEditModal: React.FC<PatientEditModalProps> = ({
       setNombre("");
       setPropietario("");
       setTelefono("");
+      setOwnerEmail("");
+      setOwnerAddress("");
       setEspecie("Canino");
       setRaza("");
       setEdad("1 año");
@@ -77,8 +87,13 @@ export const PatientEditModal: React.FC<PatientEditModalProps> = ({
     const newErrors: Record<string, string> = {};
 
     if (!nombre.trim()) newErrors.nombre = "El nombre es obligatorio";
-    if (!propietario.trim()) newErrors.propietario = "El propietario es obligatorio";
+    if (!propietario.trim()) newErrors.propietario = "El nombre del tutor es obligatorio";
     if (!telefono.trim()) newErrors.telefono = "El teléfono del tutor es requerido para WhatsApp";
+    if (!ownerEmail.trim()) {
+      newErrors.ownerEmail = "El correo del tutor es obligatorio para notificaciones";
+    } else if (!EMAIL_REGEX.test(ownerEmail.trim())) {
+      newErrors.ownerEmail = "Ingresa un correo electrónico válido";
+    }
     if (!raza.trim()) newErrors.raza = "La raza es obligatoria";
     if (!edad.trim()) newErrors.edad = "La edad es obligatoria";
 
@@ -92,6 +107,8 @@ export const PatientEditModal: React.FC<PatientEditModalProps> = ({
       propietario: propietario.trim(),
       telefono: telefono.trim(),
       ownerContact: telefono.trim(),
+      ownerEmail: ownerEmail.trim().toLowerCase(),
+      ownerAddress: ownerAddress.trim() || undefined,
       especie,
       raza: raza.trim(),
       edad: edad.trim(),
@@ -214,46 +231,86 @@ export const PatientEditModal: React.FC<PatientEditModalProps> = ({
             </div>
           </div>
 
-          {/* Propietario & Teléfono */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-semibold text-on-surface mb-1">
-                Propietario / Tutor <span className="text-error">*</span>
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={propietario}
-                  onChange={(e) => setPropietario(e.target.value)}
-                  placeholder="Ej. Sarah Jenkins"
-                  className={`w-full px-3 py-2 text-sm rounded-xl bg-surface-container-lowest border ${
-                    errors.propietario ? "border-error focus:ring-error" : "border-slate-200/80 focus:border-primary"
-                  } text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none focus:ring-1 focus:ring-primary`}
-                />
+          {/* Datos Completos del Tutor */}
+          <div className="p-3.5 rounded-xl bg-surface-container-low/70 border border-slate-200/70 space-y-3">
+            <p className="text-xs font-bold text-primary uppercase tracking-wider">
+              Datos del Tutor
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-semibold text-on-surface mb-1">
+                  Nombre completo <span className="text-error">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={propietario}
+                    onChange={(e) => setPropietario(e.target.value)}
+                    placeholder="Ej. Carlos Ramírez"
+                    className={`w-full px-3 py-2 text-sm rounded-xl bg-surface-container-lowest border ${
+                      errors.propietario ? "border-error focus:ring-error" : "border-slate-200/80 focus:border-primary"
+                    } text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none focus:ring-1 focus:ring-primary`}
+                  />
+                </div>
+                {errors.propietario && (
+                  <span className="text-[11px] text-error mt-0.5 block">{errors.propietario}</span>
+                )}
               </div>
-              {errors.propietario && (
-                <span className="text-[11px] text-error mt-0.5 block">{errors.propietario}</span>
-              )}
-            </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-on-surface mb-1">
-                Teléfono del Tutor (WhatsApp) <span className="text-error">*</span>
-              </label>
-              <div className="relative">
-                <input
-                  type="tel"
-                  value={telefono}
-                  onChange={(e) => setTelefono(e.target.value)}
-                  placeholder="Ej. 5512345678 o +5255..."
-                  className={`w-full px-3 py-2 text-sm rounded-xl bg-surface-container-lowest border ${
-                    errors.telefono ? "border-error focus:ring-error" : "border-slate-200/80 focus:border-primary"
-                  } text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none focus:ring-1 focus:ring-primary`}
-                />
+              <div>
+                <label className="block text-xs font-semibold text-on-surface mb-1">
+                  Teléfono (WhatsApp) <span className="text-error">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="tel"
+                    value={telefono}
+                    onChange={(e) => setTelefono(e.target.value)}
+                    placeholder="Ej. 5512345678 o +5255..."
+                    className={`w-full px-3 py-2 text-sm rounded-xl bg-surface-container-lowest border ${
+                      errors.telefono ? "border-error focus:ring-error" : "border-slate-200/80 focus:border-primary"
+                    } text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none focus:ring-1 focus:ring-primary`}
+                  />
+                </div>
+                {errors.telefono && (
+                  <span className="text-[11px] text-error mt-0.5 block">{errors.telefono}</span>
+                )}
               </div>
-              {errors.telefono && (
-                <span className="text-[11px] text-error mt-0.5 block">{errors.telefono}</span>
-              )}
+
+              <div>
+                <label className="block text-xs font-semibold text-on-surface mb-1">
+                  Correo electrónico <span className="text-error">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="email"
+                    value={ownerEmail}
+                    onChange={(e) => setOwnerEmail(e.target.value)}
+                    placeholder="Ej. tutor@correo.com"
+                    className={`w-full px-3 py-2 text-sm rounded-xl bg-surface-container-lowest border ${
+                      errors.ownerEmail ? "border-error focus:ring-error" : "border-slate-200/80 focus:border-primary"
+                    } text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none focus:ring-1 focus:ring-primary`}
+                  />
+                </div>
+                {errors.ownerEmail && (
+                  <span className="text-[11px] text-error mt-0.5 block">{errors.ownerEmail}</span>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-on-surface mb-1">
+                  Dirección (Opcional)
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={ownerAddress}
+                    onChange={(e) => setOwnerAddress(e.target.value)}
+                    placeholder="Calle, número, colonia"
+                    className="w-full px-3 py-2 text-sm rounded-xl bg-surface-container-lowest border border-slate-200/80 text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 

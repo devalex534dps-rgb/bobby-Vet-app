@@ -30,6 +30,7 @@ const mapDtoToPatient = (dto: BackendPatientDto): Patient => {
 
   return {
     id: dto.id,
+    tutorId: dto.tutorId,
     nombre: dto.name,
     especie,
     raza: dto.breed,
@@ -48,6 +49,8 @@ const mapDtoToPatient = (dto: BackendPatientDto): Patient => {
     photoUrl: dto.photoUrl || fallbackPhoto,
     chipId: `VET-${dto.id.slice(0, 6).toUpperCase()}`,
     ownerContact: dto.ownerContact,
+    ownerEmail: dto.ownerEmail,
+    ownerAddress: dto.ownerAddress,
     lastVisit: "Reciente",
     lastVisitType: "Control clínico",
   };
@@ -98,6 +101,8 @@ export const usePatientsData = (params?: PatientsQueryParams) => {
         clinicalStatus: data.estado || data.status || "Al día",
         ownerName: data.propietario || data.ownerName || "Propietario",
         ownerPhone: data.ownerContact || (data as any).telefono || "+52 55 0000 0000",
+        ownerEmail: data.ownerEmail,
+        ownerAddress: data.ownerAddress,
         photoUrl: data.imagen || data.photoUrl,
       });
       await queryClient.invalidateQueries({ queryKey: ["patients"] });
@@ -118,6 +123,8 @@ export const usePatientsData = (params?: PatientsQueryParams) => {
         photoUrl: updates.imagen || updates.photoUrl,
         ownerName: updates.propietario || updates.ownerName,
         ownerPhone: updates.ownerContact || (updates as any).telefono,
+        ownerEmail: updates.ownerEmail,
+        ownerAddress: updates.ownerAddress,
       });
       await queryClient.invalidateQueries({ queryKey: ["patients"] });
       return mapDtoToPatient(updated);

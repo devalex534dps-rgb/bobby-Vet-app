@@ -99,6 +99,14 @@ public class PatientService {
         if (request.ownerPhone() != null && !request.ownerPhone().isBlank() && patient.getTutor() != null) {
             patient.getTutor().setPhone(request.ownerPhone().trim());
         }
+        if (request.ownerEmail() != null && patient.getTutor() != null) {
+            String trimmedEmail = request.ownerEmail().trim().toLowerCase();
+            patient.getTutor().setEmail(trimmedEmail.isEmpty() ? null : trimmedEmail);
+        }
+        if (request.ownerAddress() != null && patient.getTutor() != null) {
+            String trimmedAddress = request.ownerAddress().trim();
+            patient.getTutor().setAddress(trimmedAddress.isEmpty() ? null : trimmedAddress);
+        }
 
         return toResponse(patientRepository.save(patient));
     }
@@ -123,7 +131,12 @@ public class PatientService {
         TutorEntity newTutor = new TutorEntity();
         newTutor.setFullName(request.ownerName().trim());
         newTutor.setPhone(request.ownerPhone().trim());
-        newTutor.setEmail(request.ownerEmail() != null ? request.ownerEmail().trim().toLowerCase() : null);
+        newTutor.setEmail(request.ownerEmail() != null && !request.ownerEmail().isBlank()
+            ? request.ownerEmail().trim().toLowerCase()
+            : null);
+        newTutor.setAddress(request.ownerAddress() != null && !request.ownerAddress().isBlank()
+            ? request.ownerAddress().trim()
+            : null);
         return tutorRepository.save(newTutor);
     }
 
@@ -141,7 +154,9 @@ public class PatientService {
             patient.getClinicalStatus(),
             patient.getPhotoUrl(),
             tutor.getFullName(),
-            tutor.getPhone()
+            tutor.getPhone(),
+            tutor.getEmail(),
+            tutor.getAddress()
         );
     }
 }

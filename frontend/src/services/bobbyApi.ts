@@ -39,6 +39,8 @@ export interface BackendPatientDto {
   photoUrl?: string;
   ownerName: string;
   ownerContact: string;
+  ownerEmail?: string;
+  ownerAddress?: string;
 }
 
 export interface BackendAppointmentDto {
@@ -200,6 +202,7 @@ export const bobbyApi = {
     ownerName?: string;
     ownerPhone?: string;
     ownerEmail?: string;
+    ownerAddress?: string;
     name: string;
     species: "Canino" | "Felino";
     breed: string;
@@ -227,6 +230,8 @@ export const bobbyApi = {
       photoUrl?: string;
       ownerName?: string;
       ownerPhone?: string;
+      ownerEmail?: string;
+      ownerAddress?: string;
     }
   ) =>
     apiRequest<BackendPatientDto>(`/patients/${id}`, {

@@ -22,6 +22,8 @@ public record PatientCreateRequest(
     @Size(max = 150, message = "El correo del tutor no puede exceder 150 caracteres")
     String ownerEmail,
 
+    String ownerAddress,
+
     @NotBlank(message = "El nombre del paciente es obligatorio")
     @Size(max = 80, message = "El nombre del paciente no puede exceder 80 caracteres")
     String name,

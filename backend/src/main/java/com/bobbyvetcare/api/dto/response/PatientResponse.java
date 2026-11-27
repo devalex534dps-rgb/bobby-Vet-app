@@ -16,5 +16,7 @@ public record PatientResponse(
     String clinicalStatus,
     String photoUrl,
     String ownerName,
-    String ownerContact
+    String ownerContact,
+    String ownerEmail,
+    String ownerAddress
 ) {}

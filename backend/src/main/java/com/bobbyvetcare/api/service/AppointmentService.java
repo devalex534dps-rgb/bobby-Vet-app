@@ -289,6 +289,7 @@ public class AppointmentService {
                         appointmentTime
                     );
                     whatsAppService.sendAppointmentReminder2h(response, tutorPhone);
+                    emailService.sendAppointmentReminder(AppointmentEmailDto.fromEntity(appointment));
                     sentCount++;
                 }
             }

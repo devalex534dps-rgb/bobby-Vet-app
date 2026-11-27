@@ -21,6 +21,7 @@ export interface Paciente {
 }
 
 export interface Patient extends Paciente {
+  tutorId?: string;
   name: string;
   chipId: string;
   photoUrl: string;
@@ -30,6 +31,8 @@ export interface Patient extends Paciente {
   gender: string;
   ownerName: string;
   ownerContact: string;
+  ownerEmail?: string;
+  ownerAddress?: string;
   lastVisit: string;
   lastVisitType: string;
   status: PatientStatus;

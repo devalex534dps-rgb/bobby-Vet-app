@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
   Edit3,
+  UserCheck,
   CalendarPlus,
   Trash2,
   AlertCircle,
@@ -15,6 +16,7 @@ import {
   PatientProfileTabs,
   PatientMilestoneCards,
   PatientEditModal,
+  TutorEditModal,
   confirmDeletePatientAlert,
   showSuccessToast,
   type ProfileTabId,
@@ -26,7 +28,7 @@ import {
   type BackendConsultationDto,
 } from "@/services/bobbyApi";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Patient, PatientSpecies, PatientStatus } from "@/components/patients/types";
 import { getStatusVariant } from "@/components/patient-profile/usePatientsData";
 
@@ -35,6 +37,8 @@ export const PatientProfile: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<ProfileTabId>("resumen");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isTutorModalOpen, setIsTutorModalOpen] = useState(false);
+  const queryClient = useQueryClient();
 
   const { getPatientById, updatePatient, deletePatient, isLoading: isListLoading } = usePatientsData();
   const cachedPatient = id ? getPatientById(id) : undefined;
@@ -48,6 +52,7 @@ export const PatientProfile: React.FC = () => {
 
   const patient: Patient | undefined = cachedPatient ?? (detailQuery.data ? {
     id: detailQuery.data.id,
+    tutorId: detailQuery.data.tutorId,
     nombre: detailQuery.data.name,
     especie: (detailQuery.data.species || "Canino") as PatientSpecies,
     raza: detailQuery.data.breed,
@@ -66,6 +71,8 @@ export const PatientProfile: React.FC = () => {
     photoUrl: detailQuery.data.photoUrl || "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=300&q=80",
     chipId: `VET-${detailQuery.data.id.slice(0, 6).toUpperCase()}`,
     ownerContact: detailQuery.data.ownerContact,
+    ownerEmail: detailQuery.data.ownerEmail,
+    ownerAddress: detailQuery.data.ownerAddress,
     lastVisit: "Reciente",
     lastVisitType: "Control clínico",
   } : undefined);
@@ -192,6 +199,17 @@ export const PatientProfile: React.FC = () => {
                 </span>
               </button>
 
+              {patient.tutorId && (
+                <button
+                  type="button"
+                  onClick={() => setIsTutorModalOpen(true)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-glass-fill backdrop-blur-md border border-primary/40 text-primary text-xs font-semibold shadow-xs hover:bg-primary hover:text-white transition-colors cursor-pointer"
+                >
+                  <UserCheck className="w-4 h-4" />
+                  <span>Editar Tutor</span>
+                </button>
+              )}
+
               <button
                 type="button"
                 onClick={handleDeletePatient}
@@ -313,6 +331,21 @@ export const PatientProfile: React.FC = () => {
             onSave={handleEditSave}
             patient={patient}
             mode="edit"
+          />
+
+          <TutorEditModal
+            isOpen={isTutorModalOpen}
+            tutorId={patient.tutorId}
+            initialName={patient.propietario}
+            initialPhone={patient.ownerContact}
+            initialEmail={patient.ownerEmail || ""}
+            initialAddress={patient.ownerAddress || ""}
+            onClose={() => setIsTutorModalOpen(false)}
+            onSaved={async () => {
+              await queryClient.invalidateQueries({ queryKey: ["patients"] });
+              await queryClient.invalidateQueries({ queryKey: ["patient", id] });
+              showSuccessToast("Tutor Actualizado", "La información del tutor ha sido guardada.");
+            }}
           />
         </>
       )}
