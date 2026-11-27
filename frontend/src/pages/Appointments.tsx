@@ -8,7 +8,7 @@ import {
   type BackendUserDto,
 } from "@/services/bobbyApi";
 import { useUsers } from "@/hooks/useUsers";
-import { confirmDeleteAlert, showToast, bobbySwal } from "@/lib/sweetalert";
+import { confirmDeleteAlert, showToast } from "@/lib/sweetalert";
 import { validateRequired } from "@/lib/formValidation";
 
 export const Appointments: React.FC = () => {
@@ -95,7 +95,7 @@ export const Appointments: React.FC = () => {
 
     setSaving(true);
     try {
-      const created = await bobbyApi.createAppointment({
+      await bobbyApi.createAppointment({
         pacienteId,
         veterinarioId,
         scheduledDate,
@@ -106,20 +106,7 @@ export const Appointments: React.FC = () => {
       });
       setShowModal(false);
       setNotes("");
-      await bobbySwal.fire({
-        icon: "success",
-        title: "Cita agendada",
-        html: `
-          <div class="text-sm text-slate-600 space-y-2">
-            <p>Se simuló el envío por <strong>WhatsApp</strong> al tutor de <strong>${created.pacienteName}</strong>.</p>
-            <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-mono">
-              Folio de seguimiento: <strong>${created.folio || "BOB-2026-NUEVO"}</strong><br/>
-              Fecha: ${created.scheduledDate} (${created.startTime.slice(0, 5)})
-            </div>
-          </div>
-        `,
-        confirmButtonText: "Entendido",
-      });
+      showToast("success", "Cita agendada");
       loadAppointments();
     } catch (err) {
       setModalError(err instanceof Error ? err.message : "No se pudo agendar la cita.");
