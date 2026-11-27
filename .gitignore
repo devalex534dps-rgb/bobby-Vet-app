@@ -84,7 +84,5 @@ Thumbs.db
 [Dd]esktop.ini
 
 # Non-frontend project files
-bruno/
-database/
 instrucciones.txt
 ".vscode/" 

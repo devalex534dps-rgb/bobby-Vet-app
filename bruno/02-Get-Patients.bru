@@ -5,11 +5,16 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/patients?page=0&size=10
+  url: https://veterinariabobby.tech/api/v1/patients?page=0&size=10
   body: none
   auth: bearer
 }
 
+params:query {
+  page: 0
+  size: 10
+}
+
 auth:bearer {
-  token: {{token}}
+  token: eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJjNzQwNWIyYy1hODI1LTQ0ZGUtYTVmMS0yZGU4OTEyN2ZjODkiLCJyb2xlIjoiQURNSU4iLCJ1c2VySWQiOiIyMjIyMjIyMi0yMjIyLTIyMjItMjIyMi0yMjIyMjIyMjIwMDEiLCJzdWIiOiJhZG1pbkBib2JieXZldGNhcmUubXgiLCJpYXQiOjE3OTU4MDM2OTYsImV4cCI6MTc5NTg5MDA5Nn0.ZzQy1QHa_GJnem37lI3MJzVCrzYf-OzvgU9syKxSna0
 }

@@ -5,9 +5,13 @@ meta {
 }
 
 post {
-  url: {{baseUrl}}/auth/register
+  url: https://veterinariabobby.tech/api/v1/auth/register
   body: json
-  auth: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJjNzQwNWIyYy1hODI1LTQ0ZGUtYTVmMS0yZGU4OTEyN2ZjODkiLCJyb2xlIjoiQURNSU4iLCJ1c2VySWQiOiIyMjIyMjIyMi0yMjIyLTIyMjItMjIyMi0yMjIyMjIyMjIwMDEiLCJzdWIiOiJhZG1pbkBib2JieXZldGNhcmUubXgiLCJpYXQiOjE3OTU4MDM2OTYsImV4cCI6MTc5NTg5MDA5Nn0.ZzQy1QHa_GJnem37lI3MJzVCrzYf-OzvgU9syKxSna0
 }
 
 body:json {
@@ -15,7 +19,7 @@ body:json {
     "fullName": "Usuario Prueba Bruno",
     "email": "bruno.test@bobbyvetcare.mx",
     "password": "BrunoUser2026!",
-    "phone": "+525512345678"
+    "phone": "+525516087771"
   }
 }
 
